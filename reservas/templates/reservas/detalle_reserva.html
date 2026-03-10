@@ -1,0 +1,94 @@
+{% extends 'reservas/base.html' %}
+{% load i18n %}
+
+{% block title %}Reserva {{ reserva.codigo_reserva }} - Hotel Paradise{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <h1 class="display-4 text-success">{% trans "✓ ¡Reserva Confirmada!" %}</h1>
+    <p class="lead">{% trans "Tu código de reserva es:" %} <strong>{{ reserva.codigo_reserva }}</strong></p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">{% trans "Detalles de la Reserva" %}</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6>{% trans "Cliente" %}</h6>
+                        <p>{{ reserva.cliente.nombre_completo }}<br>
+                        {{ reserva.cliente.email }}<br>
+                        {{ reserva.cliente.telefono }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>{% trans "Habitación" %}</h6>
+                        <p>{% trans "Número" %}: {{ reserva.habitacion.numero }}<br>
+                        {% trans "Tipo" %}: {{ reserva.habitacion.get_tipo_display }}<br>
+                        {% trans "Capacidad" %}: {{ reserva.habitacion.capacidad }} {% trans "persona(s)" %}</p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6>{% trans "Fechas" %}</h6>
+                        <p>
+                            <strong>{% trans "Entrada" %}:</strong> {{ reserva.fecha_entrada|date:"d/m/Y" }}<br>
+                            <strong>{% trans "Salida" %}:</strong> {{ reserva.fecha_salida|date:"d/m/Y" }}<br>
+                            <strong>{% trans "Noches" %}:</strong> {{ reserva.noches }}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>{% trans "Huéspedes" %}</h6>
+                        <p>
+                            {% trans "Adultos" %}: {{ reserva.numero_adultos }}<br>
+                            {% trans "Niños" %}: {{ reserva.numero_ninos }}<br>
+                            <strong>{% trans "Total" %}: {{ reserva.total_personas }} {% trans "persona(s)" %}</strong>
+                        </p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6>{% trans "Precio" %}</h6>
+                        <p>
+                            {% trans "Precio por noche" %}: {{ reserva.precio_por_noche }}€<br>
+                            {% trans "Noches" %}: {{ reserva.noches }}<br>
+                            <strong class="text-primary fs-4">{% trans "Total" %}: {{ reserva.precio_total }}€</strong>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>{% trans "Estado" %}</h6>
+                        <p>
+                            <span class="badge bg-{{ reserva.pagado|yesno:'success,warning' }} fs-6">
+                                {{ reserva.pagado|yesno:'Pagado,Pendiente de pago' }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                
+                {% if reserva.observaciones %}
+                    <hr>
+                    <h6>{% trans "Observaciones" %}</h6>
+                    <p>{{ reserva.observaciones }}</p>
+                {% endif %}
+                
+                <div class="alert alert-info mt-4">
+                    <strong>{% trans "Importante:" %}</strong> {% trans "Te hemos enviado un email de confirmación a" %} {{ reserva.cliente.email }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'home' %}" class="btn btn-primary">{% trans "Volver al Inicio" %}</a>
+            <a href="{% url 'mis_reservas' %}" class="btn btn-outline-secondary">{% trans "Ver Mis Reservas" %}</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

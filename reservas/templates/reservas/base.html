@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+{% load i18n %}
+{% load static %}
+<html lang="{% get_current_language as language_code %}{{ language_code }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- 🔍 SEO Meta Tags -->
+    <title>{% block title %}Hostal Rivera | Alojamiento y Restaurante en Becerreá, Lugo{% endblock %}</title>
+    <meta name="description" content="{% block description %}Hostal con restaurante en Becerreá, Lugo. Alojamiento cómodo, menú del día, cocina gallega tradicional. Ubicado en la Sierra de Los Ancares.{% endblock %}">
+    <meta name="keywords" content="hostal Becerreá, alojamiento Lugo, restaurante Becerreá, menú del día, Galicia">
+    <meta name="author" content="Hostal Rivera">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="{% block canonical %}https://hostal-rivera-becerre.senderosdesconocidos.top/{% endblock %}">
+    
+    <!-- 📱 Open Graph (redes sociales) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block og_title %}Hostal Rivera | Alojamiento y Restaurante en Becerreá{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Hospédete en nuestro hostal con restaurante de cocina gallega en Becerreá, Lugo{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}https://hostal-rivera-becerre.senderosdesconocidos.top/{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}https://hostal-rivera-becerre.senderosdesconocidos.top/static/og-image.jpg{% endblock %}">
+    <meta property="og:locale" content="es_ES">
+    
+    <!-- 🐦 Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}Hostal Rivera | Becerreá, Lugo{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Alojamiento con restaurante en Becerreá. Menú del día y cocina gallega.{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}https://hostal-rivera-becerre.senderosdesconocidos.top/static/og-image.jpg{% endblock %}">
+    
+    <!-- 📍 Local SEO -->
+    <meta name="geo.placename" content="Becerreá, Lugo, Galicia, España">
+    <meta name="geo.region" content="ES-LU">
+    <meta name="ICBM" content="42.4333, -6.9833">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        /* 🎨 Paleta de colores del logo Hostal Rivera */
+        :root {
+            --color-primary:   #160E6A;  /* Azul oscuro del logo */
+            --color-secondary: #EBBA00;  /* Dorado del logo      */
+            --color-primary-dark: #0D0845;
+            --color-secondary-dark: #C49A00;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--color-primary) !important;
+            border-bottom: 3px solid var(--color-secondary);
+        }
+
+        /* Botones primarios */
+        .btn-primary {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+        .btn-primary:hover {
+            background-color: var(--color-primary-dark);
+            border-color: var(--color-primary-dark);
+        }
+
+        /* Botón dorado (acento) */
+        .btn-gold {
+            background-color: var(--color-secondary);
+            border-color: var(--color-secondary);
+            color: var(--color-primary);
+            font-weight: bold;
+        }
+        .btn-gold:hover {
+            background-color: var(--color-secondary-dark);
+            border-color: var(--color-secondary-dark);
+            color: var(--color-primary);
+        }
+
+        /* Tarjetas */
+        .card {
+            transition: transform 0.2s;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 16px rgba(22,14,106,0.2);
+        }
+
+        /* Badges y etiquetas */
+        .badge.bg-primary {
+            background-color: var(--color-primary) !important;
+        }
+        .badge.bg-warning, .badge.bg-gold {
+            background-color: var(--color-secondary) !important;
+            color: var(--color-primary) !important;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--color-primary);
+            border-top: 4px solid var(--color-secondary);
+            color: white;
+            padding: 20px 0;
+            margin-top: 50px;
+        }
+
+        /* Enlace activo en navbar */
+        .navbar .nav-link:hover,
+        .navbar .nav-link.active {
+            color: var(--color-secondary) !important;
+        }
+
+        /* Separador horizontal del footer */
+        footer hr {
+            border-color: var(--color-secondary);
+            opacity: 0.4;
+        }
+    </style>
+    
+    <!-- 📊 JSON-LD Schema Markup -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Hostal Rivera",
+      "description": "Hostal con restaurante de cocina gallega tradicional en Becerreá, Lugo",
+      "url": "https://hostal-rivera-becerre.senderosdesconocidos.top/",
+      "telephone": "+34-XXX-XXX-XXX",
+      "image": "https://hostal-rivera-becerre.senderosdesconocidos.top/static/og-image.jpg",
+      "priceRange": "€€",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Becerreá",
+        "addressLocality": "Becerreá",
+        "addressRegion": "Lugo",
+        "postalCode": "27350",
+        "addressCountry": "ES"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "42.4333",
+        "longitude": "-6.9833"
+      },
+      "sameAs": [
+        "https://www.facebook.com/hostalrivera"
+      ]
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Restaurant",
+      "name": "Restaurante Hostal Rivera",
+      "url": "https://hostal-rivera-becerre.senderosdesconocidos.top/",
+      "description": "Restaurante de cocina gallega tradicional con menú del día",
+      "image": "https://hostal-rivera-becerre.senderosdesconocidos.top/static/restaurant.jpg",
+      "priceRange": "€€",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Becerreá",
+        "addressLocality": "Becerreá",
+        "addressRegion": "Lugo",
+        "postalCode": "27350",
+        "addressCountry": "ES"
+      },
+      "servesCuisine": ["Spanish", "Galician"]
+    }
+    </script>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- 🎓 CONCEPTO: Navbar = barra de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
+                <img src="{% static 'images/logo/logo.png' %}" alt="Logo Hostal Rivera" style="height:42px; width:auto; object-fit:contain;">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">{% trans "Inicio" %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'listado_habitaciones' %}">{% trans "Habitaciones" %}</a>
+                    </li>
+                    
+                    {% if user.is_authenticated %}
+                        <!-- 🔒 Usuario autenticado -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'mis_reservas' %}">{% trans "Mis Reservas" %}</a>
+                        </li>
+                        
+                        {% if user.is_staff %}
+                            <!-- 👑 Usuario administrador/staff -->
+                            <li class="nav-item">
+                                <a class="nav-link btn btn-warning ms-2" href="/admin/" target="_blank">
+                                    ⚙️ {% trans "Panel Admin" %}
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'mi_perfil' %}">👤 {{ user.username }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-outline-light ms-2" href="{% url 'logout' %}">
+                                {% trans "Cerrar Sesión" %}
+                            </a>
+                        </li>
+                    {% else %}
+                        <!-- 🔓 Usuario no autenticado -->
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-outline-light ms-2" href="{% url 'login' %}">
+                                {% trans "Iniciar Sesión" %}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-light ms-2" href="{% url 'registro_cliente' %}">
+                                {% trans "Registrarse" %}
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    <!-- 🌍 Selector de Idioma -->
+                    <li class="nav-item dropdown ms-3">
+                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown">
+                            🌐 {% trans "Idioma" %}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                            <li>
+                                <form method="post" action="{% url 'set_language' %}" class="language-form" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="language" value="es">
+                                    <input type="hidden" name="next" value="" class="next-url">
+                                    <button type="submit" class="dropdown-item" style="cursor:pointer;">
+                                        🇪🇸 Español
+                                    </button>
+                                </form>
+                            </li>
+                            <li>
+                                <form method="post" action="{% url 'set_language' %}" class="language-form" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="language" value="gl">
+                                    <input type="hidden" name="next" value="" class="next-url">
+                                    <button type="submit" class="dropdown-item" style="cursor:pointer;">
+                                        🇪🇸 Galego
+                                    </button>
+                                </form>
+                            </li>
+                            <li>
+                                <form method="post" action="{% url 'set_language' %}" class="language-form" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="language" value="en">
+                                    <input type="hidden" name="next" value="" class="next-url">
+                                    <button type="submit" class="dropdown-item" style="cursor:pointer;">
+                                        🇬🇧 English
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                        
+                        <script>
+                            // Script para cambiar idioma manteniendo la página actual
+                            document.querySelectorAll('.language-form').forEach(form => {
+                                form.addEventListener('submit', function(e) {
+                                    // Obtener la URL actual sin el prefijo de idioma
+                                    let currentPath = window.location.pathname;
+                                    // Remover el prefijo de idioma (es, gl, en)
+                                    currentPath = currentPath.replace(/^\/(es|gl|en)\//, '/');
+                                    // Obtener el idioma seleccionado
+                                    let language = this.querySelector('input[name="language"]').value;
+                                    // Construir la nueva URL
+                                    // Si es español (idioma por defecto), NO agregar prefijo
+                                    let newUrl = language === 'es' ? currentPath : '/' + language + currentPath;
+                                    // Establecer el campo next
+                                    this.querySelector('.next-url').value = newUrl;
+                                });
+                            });
+                        </script>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 🎓 CONCEPTO: Mensajes flash -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- 🎓 CONCEPTO: Block content = contenido que cambia por página -->
+    <main class="container my-5">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer text-center mt-5">
+        <div class="container py-4">
+            <div class="row mb-3">
+                <div class="col-md-4 mb-3">
+                    <h6>{% trans "Información Legal" %}</h6>
+                    <ul class="list-unstyled small">
+                        <li><a href="{% url 'politica_privacidad' %}" class="text-white-50">{% trans "Política de Privacidad" %}</a></li>
+                        <li><a href="{% url 'politica_cookies' %}" class="text-white-50">{% trans "Política de Cookies" %}</a></li>
+                        <li><a href="{% url 'terminos_condiciones' %}" class="text-white-50">{% trans "Términos y Condiciones" %}</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6>{% trans "Contacto" %}</h6>
+                    <ul class="list-unstyled small">
+                        <li><a href="mailto:info@hostalrivera.es" class="text-white-50">info@hostalrivera.es</a></li>
+                        <li><a href="tel:+34982360185" class="text-white-50">Consulta información: +34 982 360 185</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6>{% trans "Síguenos" %}</h6>
+                    <ul class="list-unstyled small">
+                        <li><a href="#" class="text-white-50">Facebook</a></li>
+                        <li><a href="#" class="text-white-50">Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="bg-white-50">
+            <p class="mb-0">&copy; 2026 {% trans "Hostal Rivera - Todos los derechos reservados" %}</p>
+            <p class="small text-white-50">{% trans "Cumplimos con RGPD, LSSI-CE y LOPDGDD" %}</p>
+        </div>
+    </footer>
+
+    <!-- 🍪 BANNER DE COOKIES MEJORADO (LSSI-CE / RGPD) -->
+    <div id="cookie-banner" class="fixed-bottom bg-dark text-white" style="display:none; z-index:9999; box-shadow: 0 -2px 10px rgba(0,0,0,0.3);">
+        <div class="container py-4">
+            <!-- Encabezado -->
+            <div class="row mb-3">
+                <div class="col-12">
+                    <h6 class="mb-2">🍪 {% trans "Gestión de Cookies" %}</h6>
+                    <p class="mb-3 small text-white-50">
+                        {% trans "Utilizamos cookies para:" %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Tipos de Cookies -->
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="card bg-secondary border-0">
+                        <div class="card-body">
+                            <h6 class="card-title">📌 {% trans "Esenciales" %}</h6>
+                            <small class="text-white-50">
+                                {% trans "Mantener sesión, seguridad, idioma" %}
+                            </small>
+                            <div class="mt-2">
+                                <span class="badge bg-success">{% trans "Siempre activas" %}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="card bg-secondary border-0">
+                        <div class="card-body">
+                            <h6 class="card-title">📊 {% trans "Análisis" %}</h6>
+                            <small class="text-white-50">
+                                {% trans "Entender cómo usas nuestro site" %}
+                            </small>
+                            <div class="mt-2">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="analytics-consent" checked>
+                                    <label class="form-check-label small" for="analytics-consent">
+                                        {% trans "Permitir" %}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card bg-secondary border-0">
+                        <div class="card-body">
+                            <h6 class="card-title">📢 {% trans "Marketing" %}</h6>
+                            <small class="text-white-50">
+                                {% trans "Anuncios personalizados" %}
+                            </small>
+                            <div class="mt-2">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="marketing-consent" checked>
+                                    <label class="form-check-label small" for="marketing-consent">
+                                        {% trans "Permitir" %}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="row">
+                <div class="col-12 d-flex gap-2 justify-content-end flex-wrap">
+                    <small class="align-self-center">
+                        <a href="{% url 'politica_cookies' %}" class="text-warning text-decoration-none">
+                            {% trans "Más información sobre cookies" %}
+                        </a>
+                    </small>
+                    <button class="btn btn-sm btn-outline-light" id="reject-all-cookies">
+                        {% trans "❌ Rechazar todo" %}
+                    </button>
+                    <button class="btn btn-sm btn-secondary" id="accept-essential-only">
+                        {% trans "✓ Solo esenciales" %}
+                    </button>
+                    <button class="btn btn-sm btn-warning text-dark fw-bold" id="accept-all-cookies">
+                        {% trans "✓✓ Aceptar todo" %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 🍪 Script de gestión de cookies granular (LSSI-CE / RGPD)
+        document.addEventListener('DOMContentLoaded', function() {
+            const cookieConsent = localStorage.getItem('cookieConsent');
+            const banner = document.getElementById('cookie-banner');
+            
+            // Mostrar banner solo si no hay consentimiento previo
+            if (!cookieConsent) {
+                banner.style.display = 'block';
+            }
+            
+            // Botón: Rechazar todo
+            document.getElementById('reject-all-cookies').addEventListener('click', function() {
+                localStorage.setItem('cookieConsent', 'rejected');
+                localStorage.setItem('analyticsConsent', 'false');
+                localStorage.setItem('marketingConsent', 'false');
+                localStorage.setItem('cookieConsentDate', new Date().toISOString());
+                banner.style.display = 'none';
+                console.log('❌ Todas las cookies rechazadas');
+            });
+            
+            // Botón: Solo esenciales
+            document.getElementById('accept-essential-only').addEventListener('click', function() {
+                localStorage.setItem('cookieConsent', 'essential');
+                localStorage.setItem('analyticsConsent', 'false');
+                localStorage.setItem('marketingConsent', 'false');
+                localStorage.setItem('cookieConsentDate', new Date().toISOString());
+                banner.style.display = 'none';
+                console.log('✓ Solo cookies esenciales aceptadas');
+            });
+            
+            // Botón: Aceptar todo
+            document.getElementById('accept-all-cookies').addEventListener('click', function() {
+                localStorage.setItem('cookieConsent', 'accepted');
+                localStorage.setItem('analyticsConsent', 'true');
+                localStorage.setItem('marketingConsent', 'true');
+                localStorage.setItem('cookieConsentDate', new Date().toISOString());
+                banner.style.display = 'none';
+                console.log('✅ Todas las cookies aceptadas');
+                
+                // Aquí se pueden cargar scripts analíticos (Google Analytics, etc.)
+                // if (localStorage.getItem('analyticsConsent') === 'true') {
+                //     // Cargar Google Analytics
+                // }
+            });
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

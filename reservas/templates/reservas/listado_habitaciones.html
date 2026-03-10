@@ -1,0 +1,69 @@
+{% extends 'reservas/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Todas las Habitaciones" %} - Hotel Paradise{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">{% trans "Todas las Habitaciones" %}</h1>
+
+<!-- Filtros -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">{% trans "Tipo de Habitación" %}</label>
+                <select name="tipo" class="form-select">
+                    <option value="">{% trans "Todos" %}</option>
+                    {% for valor, etiqueta in tipos %}
+                        <option value="{{ valor }}">{{ etiqueta }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">{% trans "Precio Máximo" %}</label>
+                <input type="number" name="precio_max" class="form-control" placeholder="Ej: 100">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">{% trans "Filtrar" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Lista de Habitaciones -->
+<div class="row">
+    {% for habitacion in habitaciones %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            {% if habitacion.foto %}
+                <img src="{{ habitacion.foto.url }}" class="card-img-top" alt="{{ habitacion.numero }}" style="height: 200px; object-fit: cover;">
+            {% else %}
+                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <span class="text-white fs-1">🏨</span>
+                </div>
+            {% endif %}
+            
+            <div class="card-body">
+                <h5 class="card-title">Hab. {{ habitacion.numero }} - {{ habitacion.get_tipo_display }}</h5>
+                {% if habitacion.tiene_vista_mar %}
+                    <span class="badge bg-primary mb-2">{% trans "Vista al mar" %} 🌊</span>
+                {% endif %}
+                <p class="card-text">
+                    <small>{% trans "Capacidad" %}: {{ habitacion.capacidad }} {% trans "persona(s)" %}</small>
+                </p>
+                <p class="text-primary fw-bold fs-5 mb-3">{{ habitacion.precio_base }}€ /{% trans "noche" %}</p>
+                <a href="{% url 'detalle_habitacion' habitacion.id %}" class="btn btn-outline-primary w-100">
+                    {% trans "Ver más" %}
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            {% trans "No se encontraron habitaciones con esos filtros." %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

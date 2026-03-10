@@ -1,0 +1,41 @@
+{% extends 'reservas/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Iniciar Sesión" %} - Hotel Paradise{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">{% trans "Iniciar Sesión" %}</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="username" class="form-label">{% trans "Nombre de usuario" %}</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">{% trans "Contraseña" %}</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        {% trans "Iniciar Sesión" %}
+                    </button>
+                </form>
+                
+                <hr>
+                
+                <p class="text-center mb-0">
+                    {% trans "¿No tienes cuenta? Regístrate" %} <a href="{% url 'registro_cliente' %}">{% trans "Regístrate" %}</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

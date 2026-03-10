@@ -1,0 +1,27 @@
+# Robots.txt para Hostal Rivera
+# 🤖 Este archivo controla qué buscadores pueden indexar
+
+User-agent: *
+Allow: /
+Allow: /habitaciones/
+Allow: /inicio/
+Allow: /restaurante/
+Allow: /contacto/
+Disallow: /admin/
+Disallow: /login/
+Disallow: /logout/
+Disallow: /registro/
+Disallow: /media/
+Disallow: /reservar/
+Disallow: /mis-reservas/
+
+# Google específicamente
+User-agent: Googlebot
+Allow: /
+
+# Bing
+User-agent: Bingbot
+Allow: /
+
+# Sitemap
+Sitemap: https://hostal-rivera-becerre.senderosdesconocidos.top/sitemap.xml

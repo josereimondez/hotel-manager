@@ -1,0 +1,53 @@
+{% extends 'reservas/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Mis Reservas" %} - Hotel Paradise{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">{% trans "Mis Reservas" %}</h1>
+
+<div class="row">
+    {% for reserva in reservas %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-{{ reserva.estado|yesno:'success,warning,secondary' }}">
+                <h5 class="mb-0 text-white">
+                    {{ reserva.codigo_reserva }}
+                    <span class="badge bg-light text-dark float-end">{{ reserva.get_estado_display }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6>{% trans "Habitación" %} {{ reserva.habitacion.numero }} - {{ reserva.habitacion.get_tipo_display }}</h6>
+                <p class="text-muted mb-2">
+                    <strong>{% trans "Cliente" %}:</strong> {{ reserva.cliente.nombre_completo }}
+                </p>
+                <p class="mb-1">
+                    📅 <strong>{% trans "Entrada" %}:</strong> {{ reserva.fecha_entrada|date:"d/m/Y" }}<br>
+                    📅 <strong>{% trans "Salida" %}:</strong> {{ reserva.fecha_salida|date:"d/m/Y" }}<br>
+                    🌙 <strong>{% trans "Noches" %}:</strong> {{ reserva.noches }}
+                </p>
+                <hr>
+                <p class="mb-2">
+                    👥 {{ reserva.total_personas }} {% trans "persona(s)" %}
+                    ({{ reserva.numero_adultos }} {% trans "adulto(s)" %}, {{ reserva.numero_ninos }} {% trans "niño(s)" %})
+                </p>
+                <p class="text-primary fw-bold fs-5 mb-3">
+                    {% trans "Total" %}: {{ reserva.precio_total }}€
+                </p>
+                <a href="{% url 'detalle_reserva' reserva.id %}" class="btn btn-outline-primary w-100">
+                    {% trans "Ver Detalles" %}
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            <h5>{% trans "No tienes reservas aún" %}</h5>
+            <p>{% trans "¡Explora nuestras habitaciones y haz tu primera reserva!" %}</p>
+            <a href="{% url 'listado_habitaciones' %}" class="btn btn-primary">{% trans "Ver Habitaciones" %}</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends "reservas/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}Hostal Rivera | Alojamiento y Restaurante en Becerreá, Lugo{% endblock %}
+
+{% block description %}Hostal con restaurante en Becerreá, Lugo. Alojamiento cómodo, menú del día, cocina gallega tradicional. Sierra de Los Ancares.{% endblock %}
+
+{% block og_title %}Hostal Rivera | Alojamiento en Becerreá, Lugo{% endblock %}
+
+{% block og_description %}Hospédete en nuestro hostal con restaurante de cocina gallega en Becerreá, Lugo. Menú del día y servicios completos.{% endblock %}
+
+{% block content %}
+
+<!-- 🔍 SEO: Hero Section con H1 principal -->
+<section class="text-center mb-5 py-5" style="background: linear-gradient(rgba(22,14,106,0.55), rgba(22,14,106,0.55)), url('{% static 'images/background/background-header.jpg' %}') center/cover no-repeat; color: white; border-radius: 8px; min-height: 320px; border-bottom: 4px solid #EBBA00;">
+    <h1 class="display-4 fw-bold">{% trans "Hostal Rivera: Tu Alojamiento en Becerreá, Lugo" %}</h1>
+    <p class="lead mt-3">{% trans "Descubre el confort de nuestro hostal con restaurante de cocina gallega tradicional en la Sierra de Los Ancares" %}</p>
+    <a href="{% url 'listado_habitaciones' %}" class="btn btn-gold btn-lg mt-3 fw-bold">
+        🛏️ {% trans "Consulta Nuestras Habitaciones" %}
+    </a>
+</section>
+
+<!-- 🔍 SEO: Párrafo introductorio con keywords locales (150-250 palabras) -->
+<section class="mb-5">
+    <article>
+        <p class="fs-5 lh-lg text-justify">
+            {% trans "Bienvenido a Hostal Rivera, tu alojamiento ideal en Becerreá, Lugo, ubicado en el corazón de la Sierra de Los Ancares en Galicia. Nuestro hostal con restaurante ofrece una experiencia única combinando confort y autenticidad, perfecta para viajeros, turistas, trabajadores en ruta y familias que buscan un alojamiento asequible sin renunciar a la calidad." %}
+            <br><br>
+            {% trans "En Hostal Rivera, disfrutarás de habitaciones cómodas y bien equipadas, ideal para descansar tras explorar los senderos de la zona. Nuestro restaurante de cocina gallega tradicional te sorprenderá con platos auténticos preparados con productos locales. No te pierdas nuestro menú del día, diseñado especialmente para ofrecer la mejor relación calidad-precio. Desde nuestro hostal en Becerreá tendrás acceso a las mejores rutas de senderismo, naturaleza virgen y la riqueza cultural de Lugo." %}
+            <br><br>
+            {% trans "Ya sea que viajes por negocios, turismo rural o en familia, Hostal Rivera es tu mejor opción en la provincia de Lugo." %}
+        </p>
+    </article>
+</section>
+
+<!-- 🔍 SEO: Sección de Habitaciones con H2 -->
+<section class="mb-5">
+    <h2 class="mb-4 fw-bold">🛏️ {% trans "Habitaciones Disponibles en Becerreá" %}</h2>
+    <p class="text-muted mb-4">{% trans "Nuestras cómodas habitaciones en el hostal de Becerreá ofrecen todo lo que necesitas para una estancia perfecta." %}</p>
+    
+    <div class="row">
+        {% for habitacion in habitaciones %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if habitacion.foto %}
+                    <img src="{{ habitacion.foto.url }}" class="card-img-top" alt="Habitación {{ habitacion.numero }}: {{ habitacion.get_tipo_display }} en Hostal Rivera" style="height: 250px; object-fit: cover;">
+                {% else %}
+                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 250px;">
+                        <span class="text-white fs-1">🏨</span>
+                    </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <h3 class="card-title fs-6">Habitación {{ habitacion.numero }} - {{ habitacion.get_tipo_display }}</h3>
+                    <p class="card-text small text-muted">
+                        <span class="badge bg-info">{{ habitacion.get_tipo_display }}</span>
+                        {% if habitacion.tiene_vista_mar %}
+                            <span class="badge bg-primary">{% trans "Vista panorámica" %} 🌅</span>
+                        {% endif %}
+                    </p>
+                    <p class="card-text">
+                        <strong>👥 {% trans "Capacidad" %}:</strong> {{ habitacion.capacidad }} {% trans "persona(s)" %}<br>
+                        <strong class="text-primary fs-5">{{ habitacion.precio_base }}€</strong>/{% trans "noche" %}
+                    </p>
+                    <p class="card-text small text-muted">{{ habitacion.descripcion|truncatewords:15 }}</p>
+                    <a href="{% url 'detalle_habitacion' habitacion.id %}" class="btn btn-primary w-100">
+                        📋 {% trans "Ver Detalles y Reservar" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not habitaciones %}
+    <div class="alert alert-info text-center">
+        <p>{% trans "No hay habitaciones disponibles en este momento." %}</p>
+    </div>
+    {% endif %}
+</section>
+
+<!-- 🔍 SEO: Servicios principales con H2 y H3 -->
+<section class="mb-5 py-4" style="background-color: #f8f9fa; border-radius: 8px; padding: 40px 20px;">
+    <h2 class="text-center mb-5 fw-bold">🎯 {% trans "Servicios en Nuestro Hostal" %}</h2>
+    
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="text-center">
+                <span class="fs-1">🍽️</span>
+                <h3 class="mt-3 fs-5">{% trans "Restaurante de Cocina Gallega" %}</h3>
+                <p class="text-muted">{% trans "Disfruta de nuestro menú del día con recetas tradicionales gallegas preparadas con productos locales de Lugo." %}</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="text-center">
+                <span class="fs-1">🌲</span>
+                <h3 class="mt-3 fs-5">{% trans "Acceso a Rutas Naturales" %}</h3>
+                <p class="text-muted">{% trans "Ubicado en la Sierra de Los Ancares. Punto de partida ideal para senderismo y turismo de naturaleza." %}</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="text-center">
+                <span class="fs-1">🅿️</span>
+                <h3 class="mt-3 fs-5">{% trans "Aparcamiento Gratuito" %}</h3>
+                <p class="text-muted">{% trans "Parking seguro y gratuito para todos nuestros huéspedes. Alojamiento sin preocupaciones en Becerreá." %}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="text-center">
+                <span class="fs-1">📶</span>
+                <h3 class="mt-3 fs-5">{% trans "Wi-Fi Gratuito" %}</h3>
+                <p class="text-muted">{% trans "Conexión a internet en todas las habitaciones y áreas comunes del hostal en Becerreá." %}</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="text-center">
+                <span class="fs-1">☕</span>
+                <h3 class="mt-3 fs-5">{% trans "Desayuno Completo" %}</h3>
+                <p class="text-muted">{% trans "Comienza el día con nuestro desayuno con productos locales de la provincia de Lugo." %}</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="text-center">
+                <span class="fs-1">🧳</span>
+                <h3 class="mt-3 fs-5">{% trans "Recepción 24h" %}</h3>
+                <p class="text-muted">{% trans "Nuestro equipo está disponible las 24 horas para ayudarte durante tu estancia en el hostal." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 🔍 SEO: Call-to-Action Section -->
+<section class="text-center py-5" style="background: linear-gradient(135deg, var(--color-primary) 0%, #2a1f8a 100%); color: white; border-radius: 8px;">
+    <h2 class="mb-4 fw-bold">📞 {% trans "Reserva Tu Alojamiento en Becerreá" %}</h2>
+    <p class="lead mb-4">{% trans "Acceso fácil a habitaciones cómodas, restaurante con menú del día y los mejores servicios para tu viaje a Lugo." %}</p>
+    <div class="d-flex flex-wrap justify-content-center gap-3">
+        <a href="{% url 'listado_habitaciones' %}" class="btn btn-light btn-lg fw-bold">
+            🔍 {% trans "Ver Todas las Habitaciones" %}
+        </a>
+        <a href="{% url 'registro_cliente' %}" class="btn btn-outline-light btn-lg fw-bold">
+            👤 {% trans "Crear Cuenta" %}
+        </a>
+        <a href="tel:+34982360185" class="btn btn-lg fw-bold"
+           style="background:#EBBA00;color:#160E6A;border:none;">
+            📲 Llámanos: +34 982 360 185
+        </a>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'reservas/base.html' %}
+{% load i18n %}
+
+{% block title %}Mi Perfil - Hostal Rivera{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+
+        <!-- Columna izquierda: datos del usuario -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center py-4">
+                    <!-- Avatar inicial -->
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                         style="width:80px;height:80px;background:var(--color-primary);font-size:2rem;color:#EBBA00;font-weight:bold;">
+                        {{ user.username|first|upper }}
+                    </div>
+                    <h5 class="card-title mb-0">{{ user.get_full_name|default:user.username }}</h5>
+                    <p class="text-muted small">@{{ user.username }}</p>
+
+                    {% if cliente and cliente.es_vip %}
+                        <span class="badge" style="background:var(--color-secondary);color:var(--color-primary);">⭐ Cliente VIP</span>
+                    {% endif %}
+
+                    <hr>
+                    <ul class="list-unstyled text-start small">
+                        <li class="mb-2"><strong>📧 Email:</strong><br>{{ user.email|default:"—" }}</li>
+                        {% if cliente %}
+                            <li class="mb-2"><strong>📞 Teléfono:</strong><br>{{ cliente.telefono|default:"—" }}</li>
+                            <li class="mb-2"><strong>📍 Ciudad:</strong><br>{{ cliente.ciudad|default:"—" }}</li>
+                            <li class="mb-2"><strong>🌍 País:</strong><br>{{ cliente.pais|default:"—" }}</li>
+                            <li class="mb-2"><strong>🎂 Edad:</strong><br>{{ cliente.edad|default:"—" }} años</li>
+                        {% endif %}
+                    </ul>
+
+                    <a href="{% url 'editar_perfil' %}" class="btn btn-primary w-100 mt-2">
+                        ✏️ Editar perfil
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna derecha: últimas reservas -->
+        <div class="col-lg-8">
+            <h2 class="h4 fw-bold mb-4" style="color:var(--color-primary);">
+                📋 Mis últimas reservas
+            </h2>
+
+            {% if reservas %}
+                <div class="list-group shadow-sm">
+                    {% for reserva in reservas %}
+                    <a href="{% url 'detalle_reserva' reserva.id %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ reserva.codigo_reserva }}</strong>
+                                <span class="text-muted ms-2">— Hab. {{ reserva.habitacion.numero }} {{ reserva.habitacion.get_tipo_display }}</span>
+                            </div>
+                            <span class="badge
+                                {% if reserva.estado == 'confirmada' %}bg-success
+                                {% elif reserva.estado == 'pendiente' %}bg-warning text-dark
+                                {% elif reserva.estado == 'cancelada' %}bg-danger
+                                {% else %}bg-secondary{% endif %}">
+                                {{ reserva.get_estado_display }}
+                            </span>
+                        </div>
+                        <small class="text-muted">
+                            📅 {{ reserva.fecha_entrada }} → {{ reserva.fecha_salida }}
+                            &nbsp;|&nbsp; {{ reserva.noches }} noches
+                            &nbsp;|&nbsp; {{ reserva.precio_total }}€
+                        </small>
+                    </a>
+                    {% endfor %}
+                </div>
+                <div class="mt-3">
+                    <a href="{% url 'mis_reservas' %}" class="btn btn-outline-primary btn-sm">
+                        Ver todas mis reservas →
+                    </a>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No tienes reservas aún.
+                    <a href="{% url 'listado_habitaciones' %}" class="alert-link">Ver habitaciones disponibles</a>.
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

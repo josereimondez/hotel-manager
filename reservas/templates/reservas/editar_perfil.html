@@ -1,0 +1,140 @@
+{% extends 'reservas/base.html' %}
+{% load i18n %}
+
+{% block title %}Editar Perfil - Hostal Rivera{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="d-flex align-items-center mb-4 gap-3">
+                <a href="{% url 'mi_perfil' %}" class="btn btn-outline-secondary btn-sm">← Volver al perfil</a>
+                <h1 class="h3 fw-bold mb-0" style="color:var(--color-primary);">✏️ Editar mi perfil</h1>
+            </div>
+
+            <!-- DATOS DE LA CUENTA -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header fw-bold" style="background:var(--color-primary);color:white;">
+                    👤 Datos de la cuenta
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="accion" value="datos">
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">{{ user_form.username.label }}</label>
+                                {{ user_form.username }}
+                                {% if user_form.username.errors %}
+                                    <div class="text-danger small mt-1">{{ user_form.username.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">{{ user_form.email.label }}</label>
+                                {{ user_form.email }}
+                                {% if user_form.email.errors %}
+                                    <div class="text-danger small mt-1">{{ user_form.email.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">{{ user_form.first_name.label }}</label>
+                                {{ user_form.first_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">{{ user_form.last_name.label }}</label>
+                                {{ user_form.last_name }}
+                            </div>
+
+                            {% if cliente_form %}
+                            <hr class="my-2">
+                            <h6 class="fw-bold" style="color:var(--color-primary);">📇 Datos personales</h6>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">{{ cliente_form.nombre.label }}</label>
+                                {{ cliente_form.nombre }}
+                                {% if cliente_form.nombre.errors %}
+                                    <div class="text-danger small mt-1">{{ cliente_form.nombre.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">{{ cliente_form.apellidos.label }}</label>
+                                {{ cliente_form.apellidos }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">{{ cliente_form.telefono.label }}</label>
+                                {{ cliente_form.telefono }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">{{ cliente_form.ciudad.label }}</label>
+                                {{ cliente_form.ciudad }}
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold">{{ cliente_form.direccion.label }}</label>
+                                {{ cliente_form.direccion }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">{{ cliente_form.codigo_postal.label }}</label>
+                                {{ cliente_form.codigo_postal }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">{{ cliente_form.pais.label }}</label>
+                                {{ cliente_form.pais }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary px-4">
+                                💾 Guardar cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- CAMBIAR CONTRASEÑA -->
+            <div class="card shadow-sm">
+                <div class="card-header fw-bold" style="background:var(--color-primary);color:white;">
+                    🔒 Cambiar contraseña
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="accion" value="password">
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">{{ password_form.password_actual.label }}</label>
+                                {{ password_form.password_actual }}
+                                {% if password_form.password_actual.errors %}
+                                    <div class="text-danger small mt-1">{{ password_form.password_actual.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">{{ password_form.password_nueva.label }}</label>
+                                {{ password_form.password_nueva }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">{{ password_form.password_confirmar.label }}</label>
+                                {{ password_form.password_confirmar }}
+                                {% if password_form.non_field_errors %}
+                                    <div class="text-danger small mt-1">{{ password_form.non_field_errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-outline-danger px-4">
+                                🔑 Cambiar contraseña
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

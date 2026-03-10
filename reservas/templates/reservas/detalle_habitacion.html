@@ -1,0 +1,122 @@
+{% extends 'reservas/base.html' %}
+{% load i18n %}
+
+{% block title %}Habitación {{ habitacion.numero }} {{ habitacion.get_tipo_display }} en Hostal Rivera, Becerreá{% endblock %}
+
+{% block description %}Habitación {{ habitacion.get_tipo_display }} en Hostal Rivera de Becerreá, Lugo. Capacidad para {{ habitacion.capacidad }} personas. Reserva en línea tu alojamiento.{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        {% if habitacion.foto %}
+            <img src="{{ habitacion.foto.url }}" class="img-fluid rounded shadow" alt="Habitación {{ habitacion.numero }}: {{ habitacion.get_tipo_display }} con capacidad para {{ habitacion.capacidad }} personas en Hostal Rivera, Becerreá">
+        {% else %}
+            <div class="bg-secondary rounded d-flex align-items-center justify-content-center" style="height: 400px;">
+                <span class="text-white" style="font-size: 100px;">🏨</span>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-6">
+        <h1>Habitación {{ habitacion.numero }}: {{ habitacion.get_tipo_display }} en Becerreá</h1>
+        <h2 class="text-muted fs-5">Alojamiento en Hostal Rivera, Lugo</h2>
+        
+        <div class="my-4">
+            {% if habitacion.tiene_vista_mar %}
+                <span class="badge bg-primary fs-6">{% trans "Vista panorámica" %} 🌅</span>
+            {% endif %}
+            <span class="badge bg-info fs-6">👥 {% trans "Capacidad" %}: {{ habitacion.capacidad }} {% trans "persona(s)" %}</span>
+        </div>
+        
+        {% if habitacion.descripcion %}
+            <p class="lead">{{ habitacion.descripcion }}</p>
+        {% endif %}
+        
+        <div class="card mt-4">
+            <div class="card-body">
+                <h3 class="card-title">{% trans "Precio en Becerreá" %}</h3>
+                <p class="display-5 text-primary fw-bold">{{ habitacion.precio_base }}€ <small class="text-muted fs-6">/{% trans "noche" %}</small></p>
+                {% if habitacion.tiene_vista_mar %}
+                    <p class="text-muted">
+                        <small>{% trans "Precio con vista panorámica" %}: {{ habitacion.precio_con_vista }}€/{% trans "noche" %}</small>
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <a href="{% url 'crear_reserva' habitacion.id %}" class="btn btn-primary btn-lg w-100 mt-4">
+            🔒 {% trans "Reservar Esta Habitación" %}
+        </a>
+        
+        <a href="{% url 'listado_habitaciones' %}" class="btn btn-outline-secondary w-100 mt-2">
+            👈 {% trans "Ver Otras Habitaciones" %}
+        </a>
+    </div>
+</div>
+
+<div class="mt-5">
+    <h2>{% trans "Servicios e Instalaciones del Hostal" %}</h2>
+    <p class="text-muted mb-4">{% trans "Todas nuestras habitaciones en Becerreá incluyen los siguientes servicios:" %}</p>
+    
+    <div class="row mt-3">
+        <div class="col-md-3 col-6 mb-3">
+            <div class="text-center">
+                <span class="fs-1">📶</span>
+                <p class="mt-2"><strong>{% trans "Wi-Fi Gratuito" %}</strong></p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="text-center">
+                <span class="fs-1">🅿️</span>
+                <p class="mt-2"><strong>{% trans "Parking Gratuito" %}</strong></p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="text-center">
+                <span class="fs-1">❄️</span>
+                <p class="mt-2"><strong>{% trans "Aire Acondicionado" %}</strong></p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="text-center">
+                <span class="fs-1">📺</span>
+                <p class="mt-2"><strong>{% trans "Televisión" %}</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-3 col-6 mb-3">
+            <div class="text-center">
+                <span class="fs-1">🚿</span>
+                <p class="mt-2"><strong>{% trans "Baño Privado" %}</strong></p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="text-center">
+                <span class="fs-1">🍽️</span>
+                <p class="mt-2"><strong>{% trans "Restaurante" %}</strong></p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="text-center">
+                <span class="fs-1">☕</span>
+                <p class="mt-2"><strong>{% trans "Desayuno" %}</strong></p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="text-center">
+                <span class="fs-1">🧳</span>
+                <p class="mt-2"><strong>{% trans "Recepción 24h" %}</strong></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-5 p-4 bg-light rounded">
+    <h3>📍 {% trans "Ubicación: Hostal Rivera en Becerreá, Lugo" %}</h3>
+    <p class="mt-3">Nuestro hostal se encuentra en <strong>Becerreá, provincia de Lugo</strong>, en la region de <strong>Galicia, España</strong>. 
+    Estamos ubicados estratégicamente en la <strong>Sierra de Los Ancares</strong>, lo que nos hace el punto de partida ideal para explorar la naturaleza y la cultura local.</p>
+</div>
+
+{% endblock %}

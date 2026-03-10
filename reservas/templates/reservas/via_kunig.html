@@ -1,0 +1,71 @@
+{% extends 'reservas/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Vía Künig: Descubre la Ruta" %} - Hostal Rivera{% endblock %}
+{% block description %}{% trans "Explora la Vía Künig, una ruta histórica del Camino de Santiago que pasa por Becerreá, Lugo. Descubre su historia y conexión con Hostal Rivera." %}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="mb-4">{% trans "Vía Künig: Una Ruta Histórica del Camino de Santiago" %}</h1>
+            <p class="text-muted mb-4"><small>{% trans "Última actualización: 4 de marzo de 2026" %}</small></p>
+
+            <p class="fs-5 lh-lg">
+                {% trans "La Vía Künig es una variante histórica del Camino de Santiago que atraviesa la hermosa región de Becerreá, Lugo. Esta ruta, recomendada por el monje alemán Hermann Künig en el siglo XV, ofrece una alternativa más corta y tranquila para los peregrinos que buscan evitar las dificultades del Camino Francés tradicional." %}
+            </p>
+
+            <h2 class="h4 mt-5">{% trans "Historia de la Vía Künig" %}</h2>
+            <p class="fs-5 lh-lg">
+                {% trans "Hermann Künig, un monje alemán, escribió una guía para peregrinos en la que recomendaba esta ruta alternativa. La Vía Künig atraviesa paisajes impresionantes, pueblos con encanto y ofrece una experiencia más íntima y auténtica del Camino de Santiago." %}
+            </p>
+
+            <h2 class="h4 mt-5">{% trans "La Vía Künig en Becerreá" %}</h2>
+            <p class="fs-5 lh-lg">
+                {% trans "Becerreá es uno de los puntos clave de la Vía Künig. Aquí, los peregrinos pueden disfrutar de la hospitalidad gallega, descansar en alojamientos como el Hostal Rivera y explorar la rica historia y cultura de la región." %}
+            </p>
+
+            <h2 class="h4 mt-5">{% trans "Enlaces de Interés" %}</h2>
+            <ul>
+                <li>
+                    <a href="https://www.caminodesantiago.gal" target="_blank" class="text-primary">
+                        {% trans "Página oficial del Camino de Santiago" %}
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.via-kunig.com" target="_blank" class="text-primary">
+                        {% trans "Descubre más sobre la Vía Künig" %}
+                    </a>
+                </li>
+            </ul>
+
+            <h2 class="h4 mt-5">{% trans "Descuentos Especiales para Peregrinos" %}</h2>
+            <p class="fs-5 lh-lg">
+                {% trans "En Hostal Rivera, ofrecemos descuentos exclusivos para los peregrinos que recorren la Vía Künig. Disfruta de una estancia cómoda y asequible mientras exploras esta histórica ruta del Camino de Santiago." %}
+            </p>
+
+            <h2 class="h4 mt-5">{% trans "Más Información sobre la Vía Künig" %}</h2>
+            <ul>
+                <li>
+                    <a href="https://viakunig.eu/tramo-11-as-nogais-becerrea/" target="_blank" class="text-primary">
+                        {% trans "Tramo 11: As Nogais – Becerreá" %}
+                    </a>
+                </li>
+                <li>
+                    <a href="https://viakunig.eu" target="_blank" class="text-primary">
+                        {% trans "Web oficial de la Vía Künig" %}
+                    </a>
+                </li>
+            </ul>
+
+            <h2 class="h4 mt-5">{% trans "Reserva tu Estancia en Hostal Rivera" %}</h2>
+            <p class="fs-5 lh-lg">
+                {% trans "Si estás planeando recorrer la Vía Künig, el Hostal Rivera en Becerreá es el lugar perfecto para descansar y disfrutar de la auténtica hospitalidad gallega. Consulta nuestras habitaciones y haz tu reserva hoy mismo." %}
+            </p>
+            <a href="{% url 'listado_habitaciones' %}" class="btn btn-primary btn-lg mt-3">
+                {% trans "Ver Habitaciones" %}
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

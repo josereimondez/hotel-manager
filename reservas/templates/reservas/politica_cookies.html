@@ -1,0 +1,146 @@
+{% extends 'reservas/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Política de Cookies" %} - Hostal Rivera{% endblock %}
+{% block description %}{% trans "Información sobre las cookies utilizadas en Hostal Rivera según la LSSI-CE" %} | Hostal Rivera Becerreá, Lugo{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="mb-4">{% trans "Política de Cookies" %}</h1>
+            <p class="text-muted mb-4"><small>{% trans "Última actualización: 3 de marzo de 2026" %}</small></p>
+
+            <!-- 1. ¿Qué es una Cookie? -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">1. {% trans "¿Qué es una Cookie?" %}</h2>
+                <p>{% trans "Una cookie es un pequeño fichero que se almacena en tu dispositivo (ordenador, móvil, tablet) cuando visitas un sitio web. Contiene información que permite identificar tu sesión y preferencias." %}</p>
+            </div>
+
+            <!-- 2. Cookies que Utilizamos -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">2. {% trans "Cookies que Utilizamos" %}</h2>
+
+                <div class="mb-4">
+                    <h5 class="text-primary">{% trans "A) Cookies Técnicas (Esenciales)" %}</h5>
+                    <p><strong>{% trans "Obligatorias:" %}</strong> Sí | <strong>{% trans "Consentimiento requerido:" %}</strong> No</p>
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>{% trans "Cookie" %}</th>
+                                <th>{% trans "Propósito" %}</th>
+                                <th>{% trans "Duración" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>sessionid</td>
+                                <td>{% trans "Mantener tu sesión iniciada" %}</td>
+                                <td>{% trans "Sesión activa + 2 semanas" %}</td>
+                            </tr>
+                            <tr>
+                                <td>csrftoken</td>
+                                <td>{% trans "Proteger contra ataques CSRF" %}</td>
+                                <td>{% trans "1 año" %}</td>
+                            </tr>
+                            <tr>
+                                <td>django_language</td>
+                                <td>{% trans "Recordar tu idioma seleccionado" %}</td>
+                                <td>{% trans "1 año" %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mb-4">
+                    <h5 class="text-primary">{% trans "B) Cookies de Análisis" %}</h5>
+                    <p><strong>{% trans "Obligatorias:" %}</strong> No | <strong>{% trans "Consentimiento requerido:" %}</strong> Sí</p>
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>{% trans "Cookie" %}</th>
+                                <th>{% trans "Proveedor" %}</th>
+                                <th>{% trans "Propósito" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>_ga, _gid</td>
+                                <td>Google Analytics</td>
+                                <td>{% trans "Analizar el comportamiento de usuarios" %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mb-4">
+                    <h5 class="text-primary">{% trans "C) Cookies de Marketing" %}</h5>
+                    <p><strong>{% trans "Obligatorias:" %}</strong> No | <strong>{% trans "Consentimiento requerido:" %}</strong> Sí</p>
+                    <p>{% trans "Se utilizan para personalizar la publicidad según tus intereses (Google Ads, Facebook Pixel, etc.)" %}</p>
+                </div>
+            </div>
+
+            <!-- 3. Cookies de Terceros -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">3. {% trans "Cookies de Terceros" %}</h2>
+                <p>{% trans "Permitimos que terceros coloquen cookies en tu dispositivo para:" %}</p>
+                <ul>
+                    <li>{% trans "Procesar pagos de forma segura" %}</li>
+                    <li>{% trans "Mostrar publicidad personalizada" %}</li>
+                    <li>{% trans "Analizar estadísticas de tráfico" %}</li>
+                    <li>{% trans "Mostrar vídeos integrados" %}</li>
+                </ul>
+            </div>
+
+            <!-- 4. Control de Cookies -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">4. {% trans "Cómo Controlar tus Cookies" %}</h2>
+                <p>{% trans "Puedes controlar y eliminar cookies desde tu navegador:" %}</p>
+                <ul>
+                    <li><strong>{% trans "Google Chrome:" %}</strong> {% trans "Menú → Configuración → Privacidad → Cookies" %}</li>
+                    <li><strong>{% trans "Mozilla Firefox:" %}</strong> {% trans "Menú → Preferencias → Privacidad → Cookies" %}</li>
+                    <li><strong>{% trans "Microsoft Edge:" %}</strong> {% trans "Menú → Configuración → Privacidad → Cookies" %}</li>
+                    <li><strong>{% trans "Safari:" %}</strong> {% trans "Preferencias → Privacidad → Cookies" %}</li>
+                </ul>
+                <div class="alert alert-warning mt-3">
+                    <strong>{% trans "⚠️ Advertencia:" %}</strong> {% trans "Si deshabilitas todas las cookies, algunos servicios (login, idioma) podrían no funcionar correctamente." %}
+                </div>
+            </div>
+
+            <!-- 5. Banner de Consentimiento -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">5. {% trans "Tu Consentimiento" %}</h2>
+                <p>{% trans "Al hacer clic en 'Aceptar' en nuestro banner de cookies, aceptas el uso de cookies técnicas, de análisis y marketing. Puedes cambiar tus preferencias en cualquier momento." %}</p>
+            </div>
+
+            <!-- 6. Derechos -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">6. {% trans "Tus Derechos" %}</h2>
+                <p>{% trans "Tienes derecho a:" %}</p>
+                <ul>
+                    <li>{% trans "Retirar tu consentimiento en cualquier momento" %}</li>
+                    <li>{% trans "Solicitar información sobre qué cookies tenemos" %}</li>
+                    <li>{% trans "Eliminar cookies de tu dispositivo" %}</li>
+                    <li>{% trans "Recurrir ante la AEPD si consideras una violación" %}</li>
+                </ul>
+            </div>
+
+            <!-- 7. Conformidad Legal -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">7. {% trans "Conformidad Legal" %}</h2>
+                <p>{% trans "Esta política cumple con:" %}</p>
+                <ul>
+                    <li><strong>{% trans "LSSI-CE:" %}</strong> {% trans "Ley 34/1988 de Servicios de la Sociedad de la Información" %}</li>
+                    <li><strong>{% trans "RGPD:" %}</strong> {% trans "Reglamento (UE) 2016/679" %}</li>
+                    <li><strong>{% trans "LOPDGDD:" %}</strong> {% trans "Ley Orgánica 3/2018" %}</li>
+                </ul>
+            </div>
+
+            <div class="alert alert-info mt-5">
+                <p class="mb-0">{% trans "¿Preguntas sobre cookies? Contacta con:" %} <strong>info@hostalrivera.es</strong></p>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

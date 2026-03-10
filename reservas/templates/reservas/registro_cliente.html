@@ -1,0 +1,162 @@
+{% extends 'reservas/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Registro de Cliente" %} - Hotel Paradise{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">{% trans "Registro de Cliente" %}</h3>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">{% trans "Regístrate para poder hacer reservas online" %}</p>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <!-- 🎓 CONCEPTO: csrf_token = protección contra ataques CSRF -->
+                    
+                    <h5 class="mt-3 mb-3">{% trans "Cuenta de Usuario" %}</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ user_form.username.label_tag }}
+                            {{ user_form.username }}
+                            {% if user_form.username.errors %}
+                                <div class="text-danger small">{{ user_form.username.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ user_form.email.label_tag }}
+                            {{ user_form.email }}
+                            {% if user_form.email.errors %}
+                                <div class="text-danger small">{{ user_form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ user_form.password.label_tag }}
+                            {{ user_form.password }}
+                            {% if user_form.password.errors %}
+                                <div class="text-danger small">{{ user_form.password.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ user_form.password_confirm.label_tag }}
+                            {{ user_form.password_confirm }}
+                            {% if user_form.password_confirm.errors %}
+                                <div class="text-danger small">{{ user_form.password_confirm.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <h5 class="mt-3 mb-3">{% trans "Datos Personales" %}</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ cliente_form.nombre.label_tag }}
+                            {{ cliente_form.nombre }}
+                            {% if cliente_form.nombre.errors %}
+                                <div class="text-danger small">{{ cliente_form.nombre.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ cliente_form.apellidos.label_tag }}
+                            {{ cliente_form.apellidos }}
+                            {% if cliente_form.apellidos.errors %}
+                                <div class="text-danger small">{{ cliente_form.apellidos.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ cliente_form.dni_nie.label_tag }}
+                            {{ cliente_form.dni_nie }}
+                            {% if cliente_form.dni_nie.errors %}
+                                <div class="text-danger small">{{ cliente_form.dni_nie.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ cliente_form.fecha_nacimiento.label_tag }}
+                            {{ cliente_form.fecha_nacimiento }}
+                            {% if cliente_form.fecha_nacimiento.errors %}
+                                <div class="text-danger small">{{ cliente_form.fecha_nacimiento.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <h5 class="mt-4 mb-3">{% trans "Contacto" %}</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ cliente_form.telefono.label_tag }}
+                            {{ cliente_form.telefono }}
+                            {% if cliente_form.telefono.errors %}
+                                <div class="text-danger small">{{ cliente_form.telefono.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <h5 class="mt-4 mb-3">{% trans "Dirección (Opcional)" %}</h5>
+                    <div class="mb-3">
+                        {{ cliente_form.direccion.label_tag }}
+                        {{ cliente_form.direccion }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ cliente_form.ciudad.label_tag }}
+                            {{ cliente_form.ciudad }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            {{ cliente_form.codigo_postal.label_tag }}
+                            {{ cliente_form.codigo_postal }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            {{ cliente_form.pais.label_tag }}
+                            {{ cliente_form.pais }}
+                        </div>
+                    </div>
+                    
+                    <!-- 📋 Consentimiento RGPD -->
+                    <div class="alert alert-info mt-4">
+                        <h5 class="mb-3">{% trans "Consentimiento y Privacidad" %}</h5>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="privacy-policy" name="privacy_policy" required>
+                            <label class="form-check-label" for="privacy-policy">
+                                {% trans "He leído y acepto la" %} <a href="{% url 'politica_privacidad' %}" target="_blank">{% trans "Política de Privacidad" %}</a> {% trans "y la" %} <a href="{% url 'terminos_condiciones' %}" target="_blank">{% trans "Política de Cookies" %}</a>
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="marketing-consent" name="marketing_consent">
+                            <label class="form-check-label" for="marketing-consent">
+                                {% trans "Deseo recibir promociones, ofertas especiales y newsletters sobre Hostal Rivera" %} ({% trans "Opcional" %})
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="data-treatment" name="data_treatment" required>
+                            <label class="form-check-label" for="data-treatment">
+                                {% trans "Autorizo a Hostal Rivera a tratar mis datos personales según se describe en la Política de Privacidad" %} <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    {% if user_form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ user_form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                    
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">
+                        {% trans "Registrarse" %}
+                    </button>
+                    
+                    <p class="text-center mt-3">
+                        {% trans "¿Ya tienes cuenta?" %} <a href="{% url 'login' %}">{% trans "Inicia sesión" %}</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

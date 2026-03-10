@@ -1,0 +1,185 @@
+{% extends 'reservas/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Términos y Condiciones" %} - Hostal Rivera{% endblock %}
+{% block description %}{% trans "Términos y condiciones de uso de Hostal Rivera" %} | Hostal Rivera Becerreá, Lugo{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="mb-4">{% trans "Términos y Condiciones" %}</h1>
+            <p class="text-muted mb-4"><small>{% trans "Última actualización: 3 de marzo de 2026" %}</small></p>
+
+            <!-- 1. Aceptación de Términos -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">1. {% trans "Aceptación de los Términos" %}</h2>
+                <p>{% trans "Al acceder y utilizar este sitio web, aceptas estar vinculado por estos términos y condiciones. Si no estás de acuerdo con alguno de estos términos, por favor no utilices esta web." %}</p>
+            </div>
+
+            <!-- 2. Definiciones -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">2. {% trans "Definiciones" %}</h2>
+                <ul>
+                    <li><strong>{% trans "Sitio Web:" %}</strong> {% trans "Hostal Rivera (hostal-rivera-becerre.senderosdesconocidos.top)" %}</li>
+                    <li><strong>{% trans "Usuario:" %}</strong> {% trans "Cualquier persona que acceda a nuestro sitio web" %}</li>
+                    <li><strong>{% trans "Reserva:" %}</strong> {% trans "Solicitud y confirmación de alojamiento" %}</li>
+                    <li><strong>{% trans "Nosotros/Empresa:" %}</strong> {% trans "Hostal Rivera" %}</li>
+                </ul>
+            </div>
+
+            <!-- 3. Uso Permitido -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">3. {% trans "Uso Permitido" %}</h2>
+                <p>{% trans "Puedes utilizar nuestro sitio web exclusivamente para:" %}</p>
+                <ul>
+                    <li>{% trans "Consultar información sobre nuestras habitaciones y servicios" %}</li>
+                    <li>{% trans "Realizar reservas de alojamiento" %}</li>
+                    <li>{% trans "Gestionar tus reservas existentes" %}</li>
+                    <li>{% trans "Cualquier otro propósito legal y legítimo" %}</li>
+                </ul>
+            </div>
+
+            <!-- 4. Uso Prohibido -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">4. {% trans "Uso Prohibido" %}</h2>
+                <p>{% trans "Expresamente está prohibido:" %}</p>
+                <ul>
+                    <li>{% trans "Acceder a sistemas no autorizados" %}</li>
+                    <li>{% trans "Recopilar datos de forma automatizada (scraping, bots)" %}</li>
+                    <li>{% trans "Enviar spam, malware o contenido perjudicial" %}</li>
+                    <li>{% trans "Hacer reservas fraudulentas o con intención de estafa" %}</li>
+                    <li>{% trans "Violar los derechos de terceros" %}</li>
+                    <li>{% trans "Interferir con el funcionamiento normal del sitio" %}</li>
+                    <li>{% trans "Compartir tus credenciales de acceso" %}</li>
+                </ul>
+            </div>
+
+            <!-- 5. Reservas y Cancelaciones -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">5. {% trans "Política de Reservas y Cancelaciones" %}</h2>
+                <div class="bg-light p-4 rounded">
+                    <h5>{% trans "Confirmación de Reserva" %}</h5>
+                    <ul>
+                        <li>{% trans "Las reservas se confirman por email inmediatamente" %}</li>
+                        <li>{% trans "Recibirás un número de confirmación único" %}</li>
+                        <li>{% trans "Guarda este número para futuras referencias" %}</li>
+                    </ul>
+                    
+                    <h5 class="mt-3">{% trans "Cancelación" %}</h5>
+                    <ul>
+                        <li>{% trans "Cancelación gratuita hasta 48 horas antes de la entrada" %}</li>
+                        <li>{% trans "Cancelaciones posteriores podrían tener cargo" %}</li>
+                        <li>{% trans "Para cancelar, contacta con nosotros o usa tu panel de reservas" %}</li>
+                    </ul>
+                    
+                    <h5 class="mt-3">{% trans "Modificaciones" %}</h5>
+                    <ul>
+                        <li>{% trans "Puedes modificar fechas sujeto a disponibilidad" %}</li>
+                        <li>{% trans "Contacta con nosotros para cambios en tu reserva" %}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 6. Precios y Pagos -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">6. {% trans "Precios y Pagos" %}</h2>
+                <ul>
+                    <li>{% trans "Los precios mostrados incluyen IVA" %}</li>
+                    <li>{% trans "El pago debe realizarse en el momento de la confirmación" %}</li>
+                    <li>{% trans "Aceptamos tarjeta de crédito/débito" %}</li>
+                    <li>{% trans "Los datos de pago se procesan de forma segura con encriptación SSL" %}</li>
+                    <li>{% trans "No almacenamos datos de tarjeta en nuestros servidores" %}</li>
+                    <li>{% trans "Puedes solicitar factura por email" %}</li>
+                </ul>
+            </div>
+
+            <!-- 7. Responsabilidad por Contenido -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">7. {% trans "Responsabilidad por Contenido" %}</h2>
+                <p>{% trans "Hostal Rivera se esfuerza por mantener la información precisa y actualizada. Sin embargo:" %}</p>
+                <ul>
+                    <li>{% trans "No garantizamos que toda la información sea exacta" %}</li>
+                    <li>{% trans "Los precios pueden cambiar sin previo aviso" %}</li>
+                    <li>{% trans "Las imágenes son orientativas" %}</li>
+                    <li>{% trans "Las descripciones pueden variar de la realidad" %}</li>
+                </ul>
+            </div>
+
+            <!-- 8. Limitación de Responsabilidad -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">8. {% trans "Limitación de Responsabilidad" %}</h2>
+                <p>{% trans "En la máxima medida permitida por la ley, Hostal Rivera no será responsable de:" %}</p>
+                <ul>
+                    <li>{% trans "Daños indirectos o incidentales" %}</li>
+                    <li>{% trans "Pérdida de datos o interrupciones del servicio" %}</li>
+                    <li>{% trans "Problemas debidos a conexión a internet del usuario" %}</li>
+                    <li>{% trans "Fallos en sistemas de terceros (bancos, procesadores de pago)" %}</li>
+                </ul>
+            </div>
+
+            <!-- 9. Propiedad Intelectual -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">9. {% trans "Propiedad Intelectual" %}</h2>
+                <p>{% trans "Todo el contenido de este sitio (textos, imágenes, logotipos, vídeos) está protegido por derechos de autor y propiedad intelectual." %}</p>
+                <ul>
+                    <li>{% trans "Prohibido copiar, distribuir o usar sin permiso" %}</li>
+                    <li>{% trans "Puedes ver, descargar y usar para propósito personal" %}</li>
+                    <li>{% trans "Cualquier otro uso requiere permiso escrito" %}</li>
+                </ul>
+            </div>
+
+            <!-- 10. Enlaces Externos -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">10. {% trans "Enlaces Externos" %}</h2>
+                <p>{% trans "Nuestro sitio puede contener enlaces a sitios externos. No somos responsables de:" %}</p>
+                <ul>
+                    <li>{% trans "El contenido de sitios externos" %}</li>
+                    <li>{% trans "La disponibilidad de esos sitios" %}</li>
+                    <li>{% trans "Políticas de privacidad de terceros" %}</li>
+                </ul>
+            </div>
+
+            <!-- 11. Seguridad de Cuenta -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">11. {% trans "Seguridad de tu Cuenta" %}</h2>
+                <ul>
+                    <li>{% trans "Eres responsable de mantener tu contraseña confidencial" %}</li>
+                    <li>{% trans "No compartirás tus credenciales con otros" %}</li>
+                    <li>{% trans "Notificarás inmediatamente de acceso no autorizado" %}</li>
+                    <li>{% trans "Eres responsable de todas las actividades bajo tu cuenta" %}</li>
+                </ul>
+            </div>
+
+            <!-- 12. Modificación de Términos -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">12. {% trans "Modificación de Términos" %}</h2>
+                <p>{% trans "Nos reservamos el derecho de modificar estos términos en cualquier momento. El uso continuado del sitio implica aceptación de los términos modificados." %}</p>
+            </div>
+
+            <!-- 13. Resolución de Disputas -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">13. {% trans "Resolución de Disputas" %}</h2>
+                <p>{% trans "Cualquier disputa se regirá por las leyes españolas. Ambas partes se comprometen a resolver conflictos de manera amistosa antes de acudir a tribunales." %}</p>
+            </div>
+
+            <!-- 14. Contacto -->
+            <div class="mb-5">
+                <h2 class="h4 mb-3">14. {% trans "Información de Contacto" %}</h2>
+                <p>{% trans "Para preguntas sobre estos términos:" %}</p>
+                <p>
+                    <strong>Hostal Rivera</strong><br>
+                    {% trans "Email:" %} <a href="mailto:legal@hostalrivera.es">legal@hostalrivera.es</a><br>
+                    {% trans "Teléfono:" %} +34-XXX-XXX-XXX<br>
+                    {% trans "Dirección:" %} Becerreá, Lugo, España
+                </p>
+            </div>
+
+            <div class="alert alert-info mt-5">
+                <p class="mb-0">{% trans "Estos términos son vinculantes. Si no los aceptas, por favor no uses nuestro sitio." %}</p>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

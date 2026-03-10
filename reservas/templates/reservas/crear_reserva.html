@@ -1,0 +1,277 @@
+{% extends 'reservas/base.html' %}
+{% load i18n %}
+
+{% block title %}Crear Reserva - Hostal Rivera{% endblock %}
+
+{% block extra_css %}
+<!-- Flatpickr: calendario de selección de fechas -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    /* Fechas ocupadas → rojo */
+    .flatpickr-day.flatpickr-disabled,
+    .flatpickr-day.ocupada {
+        background: #ffe0e0 !important;
+        color: #c0392b !important;
+        text-decoration: line-through;
+        cursor: not-allowed !important;
+    }
+    .flatpickr-day.ocupada:hover {
+        background: #ffb3b3 !important;
+    }
+    /* Rango seleccionado → azul del logo */
+    .flatpickr-day.inRange {
+        background: rgba(22,14,106,0.15) !important;
+        border-color: transparent !important;
+    }
+    .flatpickr-day.selected,
+    .flatpickr-day.startRange,
+    .flatpickr-day.endRange {
+        background: var(--color-primary) !important;
+        border-color: var(--color-primary) !important;
+    }
+    .flatpickr-day.selected:hover {
+        background: var(--color-primary-dark) !important;
+    }
+    /* Leyenda */
+    .leyenda-cal span {
+        display: inline-block;
+        width: 16px; height: 16px;
+        border-radius: 3px;
+        vertical-align: middle;
+        margin-right: 4px;
+    }
+    #precio-estimado {
+        transition: all 0.3s;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Columna lateral: resumen -->
+    <div class="col-md-4">
+        <div class="card sticky-top shadow-sm" style="top: 20px;">
+            <div class="card-header text-white" style="background:var(--color-primary);">
+                <h5 class="mb-0">{% trans "Resumen" %}</h5>
+            </div>
+            <div class="card-body">
+                <h6>{% trans "Habitación" %} {{ habitacion.numero }}</h6>
+                <p class="text-muted mb-2">{{ habitacion.get_tipo_display }}</p>
+                {% if habitacion.foto %}
+                    <img src="{{ habitacion.foto.url }}" class="img-fluid rounded mb-3" alt="{{ habitacion.numero }}">
+                {% endif %}
+                <hr>
+                <p class="mb-1"><strong>{% trans "Precio por noche" %}:</strong></p>
+                <p class="fs-4 fw-bold" style="color:var(--color-primary);">{{ habitacion.precio_con_vista }}€</p>
+
+                <!-- Precio estimado dinámico -->
+                <div id="precio-estimado" class="d-none alert alert-info p-2">
+                    <small>
+                        <strong>Estimación:</strong><br>
+                        <span id="noches-count">0</span> noches ×
+                        {{ habitacion.precio_con_vista }}€ =
+                        <strong id="total-precio">0€</strong>
+                    </small>
+                </div>
+
+                <p class="small text-muted mt-2">* {% trans "El precio total se calculará automáticamente" %}</p>
+
+                <!-- Leyenda del calendario -->
+                <hr>
+                <p class="small fw-bold mb-2">Leyenda del calendario:</p>
+                <div class="leyenda-cal small">
+                    <div class="mb-1"><span style="background:#ffe0e0;border:1px solid #e74c3c;"></span> Ocupada</div>
+                    <div class="mb-1"><span style="background:#160E6A;"></span> Seleccionada</div>
+                    <div><span style="background:rgba(22,14,106,0.15);border:1px solid #aaa;"></span> Rango elegido</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Columna principal: formulario -->
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header" style="background:var(--color-primary);color:white;">
+                <h3 class="mb-0">{% trans "Completar Reserva" %}</h3>
+            </div>
+            <div class="card-body">
+
+                <!-- Alerta si hay error de disponibilidad -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <form method="post" id="form-reserva">
+                    {% csrf_token %}
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{% trans "Fecha de Entrada" %} *</label>
+                            <input type="text"
+                                   id="id_fecha_entrada"
+                                   name="fecha_entrada"
+                                   class="form-control"
+                                   placeholder="Selecciona fecha de entrada"
+                                   value="{{ form.fecha_entrada.value|default:'' }}"
+                                   readonly>
+                            {% if form.fecha_entrada.errors %}
+                                <div class="text-danger small mt-1">{{ form.fecha_entrada.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{% trans "Fecha de Salida" %} *</label>
+                            <input type="text"
+                                   id="id_fecha_salida"
+                                   name="fecha_salida"
+                                   class="form-control"
+                                   placeholder="Selecciona fecha de salida"
+                                   value="{{ form.fecha_salida.value|default:'' }}"
+                                   readonly>
+                            {% if form.fecha_salida.errors %}
+                                <div class="text-danger small mt-1">{{ form.fecha_salida.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Aviso de disponibilidad en tiempo real -->
+                    <div id="aviso-disponibilidad" class="d-none mb-3"></div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{% trans "Adultos" %} *</label>
+                            {{ form.numero_adultos }}
+                            {% if form.numero_adultos.errors %}
+                                <div class="text-danger small">{{ form.numero_adultos.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">{% trans "Niños" %}</label>
+                            {{ form.numero_ninos }}
+                            {% if form.numero_ninos.errors %}
+                                <div class="text-danger small">{{ form.numero_ninos.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">{% trans "Observaciones" %}</label>
+                        {{ form.observaciones }}
+                    </div>
+
+                    <button type="submit" id="btn-reservar" class="btn btn-primary btn-lg w-100">
+                        {% trans "Confirmar Reserva" %}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+<script>
+    // Fechas ocupadas pasadas desde Django
+    const fechasOcupadas = {{ fechas_ocupadas_json|safe }};
+    const precioPorNoche = parseFloat("{{ habitacion.precio_con_vista }}");
+
+    // Construir lista de rangos deshabilitados para Flatpickr
+    const rangosDeshabilitados = fechasOcupadas.map(r => ({
+        from: r.from,
+        to:   r.to
+    }));
+
+    // Configuración común de Flatpickr
+    const configBase = {
+        locale: 'es',
+        dateFormat: 'Y-m-d',
+        minDate: 'today',
+        disable: rangosDeshabilitados,
+        onDayCreate: function(dObj, dStr, fp, dayElem) {
+            // Colorear en rojo los días deshabilitados (ocupados)
+            if (dayElem.classList.contains('flatpickr-disabled')) {
+                dayElem.classList.add('ocupada');
+                dayElem.title = 'Fecha no disponible';
+            }
+        }
+    };
+
+    // Flatpickr para fecha de ENTRADA
+    const fpEntrada = flatpickr('#id_fecha_entrada', {
+        ...configBase,
+        onChange: function(selectedDates) {
+            if (selectedDates.length > 0) {
+                // Actualizar mínimo de salida
+                fpSalida.set('minDate', selectedDates[0]);
+                calcularPrecio();
+                verificarDisponibilidad();
+            }
+        }
+    });
+
+    // Flatpickr para fecha de SALIDA
+    const fpSalida = flatpickr('#id_fecha_salida', {
+        ...configBase,
+        onChange: function() {
+            calcularPrecio();
+            verificarDisponibilidad();
+        }
+    });
+
+    // Calcular precio estimado en tiempo real
+    function calcularPrecio() {
+        const entrada = fpEntrada.selectedDates[0];
+        const salida  = fpSalida.selectedDates[0];
+        const bloque  = document.getElementById('precio-estimado');
+        if (entrada && salida && salida > entrada) {
+            const noches = Math.round((salida - entrada) / (1000 * 60 * 60 * 24));
+            document.getElementById('noches-count').textContent = noches;
+            document.getElementById('total-precio').textContent = (noches * precioPorNoche).toFixed(2) + '€';
+            bloque.classList.remove('d-none');
+        } else {
+            bloque.classList.add('d-none');
+        }
+    }
+
+    // Verificar si el rango elegido choca con alguna reserva existente
+    function verificarDisponibilidad() {
+        const entrada = fpEntrada.selectedDates[0];
+        const salida  = fpSalida.selectedDates[0];
+        const aviso   = document.getElementById('aviso-disponibilidad');
+        const btn     = document.getElementById('btn-reservar');
+
+        if (!entrada || !salida) {
+            aviso.classList.add('d-none');
+            return;
+        }
+
+        let conflicto = false;
+        fechasOcupadas.forEach(r => {
+            const desde = new Date(r.from);
+            const hasta = new Date(r.to);
+            // Solapamiento: entrada < hasta Y salida > desde
+            if (entrada < hasta && salida > desde) {
+                conflicto = true;
+            }
+        });
+
+        aviso.classList.remove('d-none');
+        if (conflicto) {
+            aviso.className = 'alert alert-danger mb-3';
+            aviso.innerHTML = '🚫 <strong>No disponible:</strong> La habitación ya está reservada en parte del rango seleccionado. Por favor elige otras fechas.';
+            btn.disabled = true;
+            btn.classList.add('btn-secondary');
+            btn.classList.remove('btn-primary');
+        } else {
+            aviso.className = 'alert alert-success mb-3';
+            aviso.innerHTML = '✅ <strong>¡Disponible!</strong> La habitación está libre para las fechas elegidas.';
+            btn.disabled = false;
+            btn.classList.add('btn-primary');
+            btn.classList.remove('btn-secondary');
+        }
+    }
+</script>
+{% endblock %}

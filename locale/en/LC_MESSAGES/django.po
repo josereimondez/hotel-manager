@@ -1,0 +1,701 @@
+# English translation
+# Copyright (C) 2026 Hostal Rivera
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Hostal Rivera 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-03 22:53+0100\n"
+"PO-Revision-Date: 2026-03-03 22:53+0100\n"
+"Last-Translator: Hostal Rivera\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: base.html navbar
+msgid "Idioma"
+msgstr "Language"
+
+msgid "Inicio"
+msgstr "Home"
+
+msgid "Habitaciones"
+msgstr "Rooms"
+
+msgid "Mis Reservas"
+msgstr "My Bookings"
+
+msgid "Panel Admin"
+msgstr "Admin Panel"
+
+msgid "Cerrar Sesión"
+msgstr "Logout"
+
+msgid "Iniciar Sesión"
+msgstr "Login"
+
+msgid "Registrarse"
+msgstr "Sign Up"
+
+msgid "Hostal Rivera"
+msgstr "Hostal Rivera"
+
+msgid "Desarrollado con Django"
+msgstr "Built with Django"
+
+#: home.html
+msgid "Consulta Nuestras Habitaciones"
+msgstr "Check Our Rooms"
+
+msgid "Ver Todas las Habitaciones"
+msgstr "View All Rooms"
+
+msgid "Crear Cuenta"
+msgstr "Create Account"
+
+msgid "Habitaciones Disponibles en Becerreá"
+msgstr "Available Rooms in Becerreá"
+
+msgid "Servicios en Nuestro Hostal"
+msgstr "Our Hostel Services"
+
+msgid "Restaurante de Cocina Gallega"
+msgstr "Traditional Galician Cuisine Restaurant"
+
+msgid "Acceso a Rutas Naturales"
+msgstr "Access to Natural Routes"
+
+msgid "Aparcamiento Gratuito"
+msgstr "Free Parking"
+
+msgid "Desayuno Completo"
+msgstr "Full Breakfast"
+
+msgid "Recepción 24h"
+msgstr "24/7 Reception"
+
+msgid "Reserva Tu Alojamiento en Becerreá"
+msgstr "Book Your Stay in Becerreá"
+
+msgid "Bienvenido a Hostal Rivera"
+msgstr "Welcome to Hostal Rivera"
+
+msgid ""
+"Nuestras cómodas habitaciones en el hostal de Becerreá ofrecen todo lo que "
+"necesitas para una estancia perfecta."
+msgstr ""
+"Our comfortable rooms in Becerreá hostel offer everything you need for a "
+"perfect stay."
+
+msgid "Vista panorámica"
+msgstr "Panoramic view"
+
+msgid "Capacidad"
+msgstr "Capacity"
+
+msgid "persona(s)"
+msgstr "person(s)"
+
+msgid "Ver Detalles y Reservar"
+msgstr "View Details and Book"
+
+msgid "No hay habitaciones disponibles en este momento."
+msgstr "No rooms available at this time."
+
+msgid "Wi-Fi Gratuito"
+msgstr "Free Wi-Fi"
+
+msgid "Hostal Rivera: Tu Alojamiento en Becerreá, Lugo"
+msgstr "Hostal Rivera: Your Accommodation in Becerreá, Lugo"
+
+msgid ""
+"Descubre el confort de nuestro hostal con restaurante de cocina gallega "
+"tradicional en la Sierra de Los Ancares"
+msgstr ""
+"Discover the comfort of our hostel with traditional Galician cuisine "
+"restaurant in Os Ancares"
+
+msgid "noche"
+msgstr "night"
+
+msgid "menú del día"
+msgstr "daily menu"
+
+msgid ""
+"Disfruta de nuestro menú del día con recetas tradicionales gallegas "
+"preparadas con productos locales de Lugo."
+msgstr ""
+"Enjoy our daily menu with traditional Galician recipes prepared with local "
+"products from Lugo."
+
+msgid ""
+"Ubicado en la Sierra de Los Ancares. Punto de partida ideal para senderismo "
+"y turismo de naturaleza."
+msgstr ""
+"Located in Os Ancares. Ideal starting point for hiking and nature tourism."
+
+msgid ""
+"Parking seguro y gratuito para todos nuestros huéspedes. Alojamiento sin "
+"preocupaciones en Becerreá."
+msgstr ""
+"Secure free parking for all our guests. Worry-free accommodation in "
+"Becerreá."
+
+msgid ""
+"Conexión a internet en todas las habitaciones y áreas comunes del hostal en "
+"Becerreá."
+msgstr ""
+"Internet connection in all rooms and common areas of the hostel in Becerreá."
+
+msgid ""
+"Comienza el día con nuestro desayuno con productos locales de la provincia "
+"de Lugo."
+msgstr ""
+"Start your day with our breakfast with local products from the province of "
+"Lugo."
+
+msgid ""
+"Nuestro equipo está disponible las 24 horas para ayudarte durante tu "
+"estancia en el hostal."
+msgstr ""
+"Our team is available 24 hours to help you during your stay in the hostel."
+
+msgid ""
+"Acceso fácil a habitaciones cómodas, restaurante con menú del día y los "
+"mejores servicios para tu viaje a Lugo."
+msgstr ""
+"Easy access to comfortable rooms, restaurant with daily menu and the best "
+"services for your trip to Lugo."
+
+msgid "Todas las Habitaciones"
+msgstr "All Rooms"
+
+msgid "Tipo de Habitación"
+msgstr "Room Type"
+
+msgid "Todos"
+msgstr "All"
+
+msgid "Precio Máximo"
+msgstr "Maximum Price"
+
+msgid "Filtrar"
+msgstr "Filter"
+
+msgid "Vista al mar"
+msgstr "Sea view"
+
+msgid "Ver más"
+msgstr "View more"
+
+msgid "No se encontraron habitaciones con esos filtros."
+msgstr "No rooms found with those filters."
+
+msgid "Nombre de usuario"
+msgstr "Username"
+
+msgid "Contraseña"
+msgstr "Password"
+
+msgid "¿No tienes cuenta? Regístrate"
+msgstr "Don't have an account? Sign up"
+
+msgid "Registro de Cliente"
+msgstr "Client Registration"
+
+msgid "Regístrate para poder hacer reservas online"
+msgstr "Sign up to make online reservations"
+
+msgid "Cuenta de Usuario"
+msgstr "User Account"
+
+msgid "Datos Personales"
+msgstr "Personal Data"
+
+msgid "Contacto"
+msgstr "Contact"
+
+msgid "Dirección (Opcional)"
+msgstr "Address (Optional)"
+
+msgid "¿Ya tienes cuenta? Inicia sesión"
+msgstr "Already have an account? Sign in"
+
+msgid "Precio en Becerreá"
+msgstr "Price in Becerreá"
+
+msgid "Reservar Esta Habitación"
+msgstr "Book This Room"
+
+msgid "Ver Otras Habitaciones"
+msgstr "View Other Rooms"
+
+msgid "Servicios e Instalaciones del Hostal"
+msgstr "Hostel Services and Facilities"
+
+msgid ""
+"Todas nuestras habitaciones en Becerreá incluyen los siguientes servicios:"
+msgstr "All our rooms in Becerreá include the following services:"
+
+msgid "WiFi Gratis"
+msgstr "Free WiFi"
+
+msgid "Parking Gratuito"
+msgstr "Free Parking"
+
+msgid "Aire Acondicionado"
+msgstr "Air Conditioning"
+
+msgid "Televisión"
+msgstr "Television"
+
+msgid "Baño Privado"
+msgstr "Private Bathroom"
+
+msgid "Restaurante"
+msgstr "Restaurant"
+
+msgid "Desayuno"
+msgstr "Breakfast"
+
+msgid "Ubicación: Hostal Rivera en Becerreá, Lugo"
+msgstr "Location: Hostal Rivera in Becerreá, Lugo"
+
+msgid "Resumen"
+msgstr "Summary"
+
+msgid "Completar Reserva"
+msgstr "Complete Reservation"
+
+msgid "Cliente"
+msgstr "Client"
+
+msgid "Fecha de Entrada"
+msgstr "Check-in Date"
+
+msgid "Fecha de Salida"
+msgstr "Check-out Date"
+
+msgid "Adultos"
+msgstr "Adults"
+
+msgid "Niños"
+msgstr "Children"
+
+msgid "Observaciones"
+msgstr "Observations"
+
+msgid "Confirmar Reserva"
+msgstr "Confirm Reservation"
+
+msgid "No tienes reservas aún"
+msgstr "You don't have reservations yet"
+
+msgid "¡Explora nuestras habitaciones y haz tu primera reserva!"
+msgstr "Explore our rooms and make your first reservation!"
+
+msgid "Ver Detalles"
+msgstr "View Details"
+
+msgid "✓ ¡Reserva Confirmada!"
+msgstr "✓ Reservation Confirmed!"
+
+msgid "Tu código de reserva es:"
+msgstr "Your reservation code is:"
+
+msgid "Detalles de la Reserva"
+msgstr "Reservation Details"
+
+msgid "Fechas"
+msgstr "Dates"
+
+msgid "Entrada"
+msgstr "Check-in"
+
+msgid "Salida"
+msgstr "Check-out"
+
+msgid "Noches"
+msgstr "Nights"
+
+msgid "Huéspedes"
+msgstr "Guests"
+
+msgid "Precio"
+msgstr "Price"
+
+msgid "Estado"
+msgstr "Status"
+
+msgid "Pagado"
+msgstr "Paid"
+
+msgid "Pendiente de pago"
+msgstr "Pending payment"
+
+msgid "Te hemos enviado un email de confirmación a"
+msgstr "We have sent you a confirmation email to"
+
+msgid "Volver al Inicio"
+msgstr "Back to Home"
+
+msgid "Ver Mis Reservas"
+msgstr "View My Reservations"
+
+msgid "adulto(s)"
+msgstr "adult(s)"
+
+msgid "niño(s)"
+msgstr "child(ren)"
+
+msgid "Número"
+msgstr "Number"
+
+msgid "Tipo"
+msgstr "Type"
+
+msgid "Importante:"
+msgstr "Important:"
+
+msgid "¿No estás registrado?"
+msgstr "Not registered?"
+
+msgid "Regístrate aquí"
+msgstr "Sign up here"
+
+msgid "El precio total se calculará automáticamente"
+msgstr "The total price will be calculated automatically"
+
+msgid "Precio con vista panorámica"
+msgstr "Price with panoramic view"
+
+msgid "Inicia sesión"
+msgstr "Sign in"
+
+#: legal_strings
+msgid "Política de Privacidad"
+msgstr "Privacy Policy"
+
+#: legal_strings
+msgid ""
+"Conoce cómo tratamos tus datos personales en Hostal Rivera de acuerdo a la "
+"normativa RGPD"
+msgstr ""
+"Learn how we handle your personal data at Hostal Rivera in accordance with "
+"GDPR"
+
+#: legal_strings
+msgid "Última actualización: 3 de marzo de 2026"
+msgstr "Last updated: March 3, 2026"
+
+#: legal_strings
+msgid "Responsable del Tratamiento de Datos"
+msgstr "Data Controller"
+
+#: legal_strings
+msgid "Nombre:"
+msgstr "Name:"
+
+#: legal_strings
+msgid "Dirección:"
+msgstr "Address:"
+
+#: legal_strings
+msgid "Email de contacto:"
+msgstr "Contact Email:"
+
+#: legal_strings
+msgid "Teléfono:"
+msgstr "Phone:"
+
+#: legal_strings
+msgid "Información General sobre la Protección de Datos"
+msgstr "General Data Protection Information"
+
+#: legal_strings
+msgid "¿Qué Datos Recogemos?"
+msgstr "What Data Do We Collect?"
+
+#: legal_strings
+msgid "Recopilamos los siguientes datos personales:"
+msgstr "We collect the following personal data:"
+
+#: legal_strings
+msgid "Datos de Identificación:"
+msgstr "Identification Data:"
+
+#: legal_strings
+msgid "Nombre completo, email, teléfono"
+msgstr "Full name, email, phone"
+
+#: legal_strings
+msgid "Política de Cookies"
+msgstr "Cookie Policy"
+
+#: legal_strings
+msgid ""
+"Información sobre las cookies utilizadas en Hostal Rivera según la LSSI-CE"
+msgstr "Information about cookies used at Hostal Rivera according to LSSI-CE"
+
+#: legal_strings
+msgid "¿Qué es una Cookie?"
+msgstr "What is a Cookie?"
+
+#: legal_strings
+msgid "Una cookie es un pequeño fichero que se almacena en tu dispositivo..."
+msgstr "A cookie is a small file stored on your device..."
+
+#: legal_strings
+msgid "Cookies que Utilizamos"
+msgstr "Cookies We Use"
+
+#: legal_strings
+msgid "A) Cookies Técnicas (Esenciales)"
+msgstr "A) Technical Cookies (Essential)"
+
+#: legal_strings
+msgid "Obligatorias:"
+msgstr "Required:"
+
+#: legal_strings
+msgid "Consentimiento requerido:"
+msgstr "Consent required:"
+
+#: legal_strings
+msgid "Términos y Condiciones"
+msgstr "Terms and Conditions"
+
+#: legal_strings
+msgid "Términos y condiciones de uso de Hostal Rivera"
+msgstr "Terms and conditions of use of Hostal Rivera"
+
+#: legal_strings
+msgid "Aceptación de los Términos"
+msgstr "Acceptance of Terms"
+
+#: legal_strings
+msgid ""
+"Utilizamos cookies para mejorar tu experiencia. Al continuar, aceptas "
+"nuestro uso de cookies."
+msgstr ""
+"We use cookies to improve your experience. By continuing, you accept our use"
+" of cookies."
+
+#: legal_strings
+msgid "Más información"
+msgstr "More information"
+
+#: legal_strings
+msgid "Rechazar"
+msgstr "Reject"
+
+#: legal_strings
+msgid "Aceptar"
+msgstr "Accept"
+
+#: legal_strings
+msgid "Información Legal"
+msgstr "Legal Information"
+
+#: legal_strings
+msgid "Síguenos"
+msgstr "Follow us"
+
+#: legal_strings
+msgid "Hostal Rivera - Todos los derechos reservados"
+msgstr "Hostal Rivera - All rights reserved"
+
+#: legal_strings
+msgid "Cumplimos con RGPD, LSSI-CE y LOPDGDD"
+msgstr "We comply with GDPR, LSSI-CE and LOPDGDD"
+
+#: legal_strings
+msgid "Consentimiento y Privacidad"
+msgstr "Consent and Privacy"
+
+#: legal_strings
+msgid "He leído y acepto la"
+msgstr "I have read and accept the"
+
+#: legal_strings
+msgid "y la"
+msgstr "and the"
+
+#: legal_strings
+msgid ""
+"Deseo recibir promociones, ofertas especiales y newsletters sobre Hostal "
+"Rivera"
+msgstr ""
+"I wish to receive promotions, special offers and newsletters about Hostal "
+"Rivera"
+
+#: legal_strings
+msgid "Opcional"
+msgstr "Optional"
+
+#: legal_strings
+msgid ""
+"Autorizo a Hostal Rivera a tratar mis datos personales según se describe en "
+"la Política de Privacidad"
+msgstr ""
+"I authorize Hostal Rivera to process my personal data as described in the "
+"Privacy Policy"
+
+#: home.html
+msgid ""
+"Bienvenido a Hostal Rivera, tu alojamiento ideal en Becerreá, Lugo, ubicado "
+"en el corazón de la Sierra de Los Ancares en Galicia. Nuestro hostal con "
+"restaurante ofrece una experiencia única combinando confort y autenticidad, "
+"perfecta para viajeros, turistas, trabajadores en ruta y familias que buscan"
+" un alojamiento asequible sin renunciar a la calidad."
+msgstr ""
+"Welcome to Hostal Rivera, your ideal accommodation in Becerreá, Lugo, "
+"located in the heart of the Ancares Mountains in Galicia. Our hostel with "
+"restaurant offers a unique experience combining comfort and authenticity, "
+"perfect for travelers, tourists, traveling professionals and families "
+"seeking affordable accommodation without sacrificing quality."
+
+#: home.html
+msgid ""
+"En Hostal Rivera, disfrutarás de habitaciones cómodas y bien equipadas, "
+"ideal para descansar tras explorar los senderos de la zona. Nuestro "
+"restaurante de cocina gallega tradicional te sorprenderá con platos "
+"auténticos preparados con productos locales. No te pierdas nuestro menú del "
+"día, diseñado especialmente para ofrecer la mejor relación calidad-precio. "
+"Desde nuestro hostal en Becerreá tendrás acceso a las mejores rutas de "
+"senderismo, naturaleza virgen y la riqueza cultural de Lugo."
+msgstr ""
+"At Hostal Rivera, you will enjoy comfortable and well-equipped rooms, ideal "
+"for resting after exploring the trails in the area. Our traditional Galician"
+" cuisine restaurant will surprise you with authentic dishes prepared with "
+"local products. Don't miss our daily menu, specially designed to offer the "
+"best value for money. From our hostel in Becerreá you will have access to "
+"the best hiking routes, pristine nature and the rich cultural heritage of "
+"Lugo."
+
+#: home.html
+msgid ""
+"Ya sea que viajes por negocios, turismo rural o en familia, Hostal Rivera es"
+" tu mejor opción en la provincia de Lugo."
+msgstr ""
+"Whether you travel for business, rural tourism or with family, Hostal Rivera"
+" is your best choice in the province of Lugo."
+
+#: base.html
+msgid "Gestión de Cookies"
+msgstr "Cookie Management"
+
+#: base.html
+msgid "Utilizamos cookies para:"
+msgstr "We use cookies for:"
+
+#: base.html
+msgid "Esenciales"
+msgstr "Essential"
+
+#: base.html
+msgid "Mantener sesión, seguridad, idioma"
+msgstr "Maintain session, security, language"
+
+#: base.html
+msgid "Siempre activas"
+msgstr "Always active"
+
+#: base.html
+msgid "Análisis"
+msgstr "Analytics"
+
+#: base.html
+msgid "Entender cómo usas nuestro site"
+msgstr "Understanding how you use our site"
+
+#: base.html
+msgid "Permitir"
+msgstr "Allow"
+
+#: base.html
+msgid "Marketing"
+msgstr "Marketing"
+
+#: base.html
+msgid "Anuncios personalizados"
+msgstr "Personalized ads"
+
+#: base.html
+msgid "Más información sobre cookies"
+msgstr "More information about cookies"
+
+#: base.html
+msgid "❌ Rechazar todo"
+msgstr "❌ Reject all"
+
+#: base.html
+msgid "✓ Solo esenciales"
+msgstr "✓ Essential only"
+
+#: base.html
+msgid "✓✓ Aceptar todo"
+msgstr "✓✓ Accept all"
+
+#: via_kunig.html
+msgid "Vía Künig: Descubre la Ruta"
+msgstr "Vía Künig: Discover the Route"
+
+msgid "Explora la Vía Künig, una ruta histórica del Camino de Santiago que pasa por Becerreá, Lugo. Descubre su historia y conexión con Hostal Rivera."
+msgstr "Explore the Vía Künig, a historic route of the Camino de Santiago that passes through Becerreá, Lugo. Discover its history and connection with Hostal Rivera."
+
+msgid "Vía Künig: Una Ruta Histórica del Camino de Santiago"
+msgstr "Vía Künig: A Historic Route of the Camino de Santiago"
+
+msgid "Última actualización: 4 de marzo de 2026"
+msgstr "Last updated: March 4, 2026"
+
+msgid "La Vía Künig es una variante histórica del Camino de Santiago que atraviesa la hermosa región de Becerreá, Lugo. Esta ruta, recomendada por el monje alemán Hermann Künig en el siglo XV, ofrece una alternativa más corta y tranquila para los peregrinos que buscan evitar las dificultades del Camino Francés tradicional."
+msgstr "The Vía Künig is a historic variant of the Camino de Santiago that crosses the beautiful region of Becerreá, Lugo. This route, recommended by the German monk Hermann Künig in the 15th century, offers a shorter and more peaceful alternative for pilgrims looking to avoid the difficulties of the traditional Camino Francés."
+
+msgid "Historia de la Vía Künig"
+msgstr "History of the Vía Künig"
+
+msgid "Hermann Künig, un monje alemán, escribió una guía para peregrinos en la que recomendaba esta ruta alternativa. La Vía Künig atraviesa paisajes impresionantes, pueblos con encanto y ofrece una experiencia más íntima y auténtica del Camino de Santiago."
+msgstr "Hermann Künig, a German monk, wrote a guide for pilgrims in which he recommended this alternative route. The Vía Künig crosses impressive landscapes, charming villages and offers a more intimate and authentic experience of the Camino de Santiago."
+
+msgid "La Vía Künig en Becerreá"
+msgstr "The Vía Künig in Becerreá"
+
+msgid "Becerreá es uno de los puntos clave de la Vía Künig. Aquí, los peregrinos pueden disfrutar de la hospitalidad gallega, descansar en alojamientos como el Hostal Rivera y explorar la rica historia y cultura de la región."
+msgstr "Becerreá is one of the key points of the Vía Künig. Here, pilgrims can enjoy Galician hospitality, rest at accommodations like Hostal Rivera and explore the rich history and culture of the region."
+
+msgid "Enlaces de Interés"
+msgstr "Links of Interest"
+
+msgid "Página oficial del Camino de Santiago"
+msgstr "Official Website of the Camino de Santiago"
+
+msgid "Descubre más sobre la Vía Künig"
+msgstr "Discover more about the Vía Künig"
+
+msgid "Descuentos Especiales para Peregrinos"
+msgstr "Special Discounts for Pilgrims"
+
+msgid "En Hostal Rivera, ofrecemos descuentos exclusivos para los peregrinos que recorren la Vía Künig. Disfruta de una estancia cómoda y asequible mientras exploras esta histórica ruta del Camino de Santiago."
+msgstr "At Hostal Rivera, we offer exclusive discounts for pilgrims traveling the Vía Künig. Enjoy a comfortable and affordable stay while exploring this historic route of the Camino de Santiago."
+
+msgid "Más Información sobre la Vía Künig"
+msgstr "More Information about the Vía Künig"
+
+msgid "Tramo 11: As Nogais – Becerreá"
+msgstr "Stage 11: As Nogais – Becerreá"
+
+msgid "Web oficial de la Vía Künig"
+msgstr "Official Website of the Vía Künig"
+
+msgid "Reserva tu Estancia en Hostal Rivera"
+msgstr "Book your Stay at Hostal Rivera"
+
+msgid "Si estás planeando recorrer la Vía Künig, el Hostal Rivera en Becerreá es el lugar perfecto para descansar y disfrutar de la auténtica hospitalidad gallega. Consulta nuestras habitaciones y haz tu reserva hoy mismo."
+msgstr "If you are planning to travel the Vía Künig, Hostal Rivera in Becerreá is the perfect place to rest and enjoy authentic Galician hospitality. Check our rooms and make your reservation today."
+
+msgid "Ver Habitaciones"
+msgstr "View Rooms"
