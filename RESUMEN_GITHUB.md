@@ -183,7 +183,7 @@ python-stdnum==1.20
 
 ### Desarrollo (.env local - NO se sube)
 ```env
-SECRET_KEY=django-insecure-REDACTED-FOR-SECURITY
+SECRET_KEY=django-insecure-CAMBIAR-POR-TU-CLAVE-SECRETA-DE-50-CARACTERES
 DEBUG=True
 ALLOWED_HOSTS=localhost,127.0.0.1
 DB_ENGINE=django.db.backends.sqlite3
