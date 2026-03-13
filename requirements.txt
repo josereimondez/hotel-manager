@@ -10,7 +10,7 @@ psycopg2-binary==2.9.9  # PostgreSQL (opcional)
 
 # Formularios y UI
 django-crispy-forms==2.1
-crispy-bootstrap5==2.0.0
+crispy-bootstrap5==2024.2
 
 # Reportes
 reportlab==4.1.0

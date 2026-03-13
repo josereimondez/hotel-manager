@@ -1,14 +1,13 @@
+import json
+from datetime import date, timedelta
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
-from django.db.models import Q
 from django.http import JsonResponse
+from django.utils.html import strip_tags
 from django_ratelimit.decorators import ratelimit
-from django_ratelimit.exceptions import Ratelimited
-from datetime import date, timedelta
-import json
 from .models import Habitacion, Cliente, Reserva
 from .forms import ClienteRegistroForm, ReservaForm, RegistroUsuarioForm, EditarUsuarioForm, EditarClienteForm, CambiarPasswordForm
 
@@ -46,7 +45,6 @@ def listado_habitaciones(request):
     habitaciones = Habitacion.objects.all()
     
     # 🔍 Filtros opcionales con sanitización
-    from django.utils.html import strip_tags
     tipo = strip_tags(request.GET.get('tipo', '').strip())
     precio_max = request.GET.get('precio_max', '')
     
@@ -234,7 +232,7 @@ def fechas_ocupadas(request, habitacion_id):
     return JsonResponse({'ocupadas': rangos})
 
 
-def detalle_reserva(request, id):
+def detalle_reserva(request, id):  # pylint: disable=redefined-builtin
     """
     Vista de detalle de reserva.
     """
@@ -276,7 +274,6 @@ def login_view(request):
     Rate limit: 5 intentos por minuto (previene brute force)
     """
     if request.method == 'POST':
-        from django.utils.html import strip_tags
         # Sanitizar inputs
         username = strip_tags(request.POST.get('username', '').strip())
         password = request.POST.get('password', '')  # No sanitizar password
@@ -295,8 +292,8 @@ def login_view(request):
             # Redirigir a la página que intentaba acceder o al home
             next_url = request.GET.get('next', 'home')
             return redirect(next_url)
-        else:
-            messages.error(request, 'Usuario o contraseña incorrectos')
+
+        messages.error(request, 'Usuario o contraseña incorrectos')
     
     return render(request, 'reservas/login.html')
 
