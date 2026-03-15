@@ -1,8 +1,10 @@
 import re
 
 from django import forms
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.utils.html import strip_tags
+
+User = get_user_model()
 from .models import (Cliente, Reserva, MenuDelDia, PlatoMenuDelDia,
                      MenuEspecial, PlatoMenuEspecial, ViajeroCheckin)
 
