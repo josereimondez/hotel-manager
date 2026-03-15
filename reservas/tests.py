@@ -1,3 +1,2 @@
-from django.test import TestCase
-
-# Create your tests here.
+# Tests de la aplicación de reservas
+# Para ejecutar: python manage.py test reservas

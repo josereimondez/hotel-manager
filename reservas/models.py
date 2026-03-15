@@ -1,11 +1,12 @@
-from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator, EmailValidator
-from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User  # 👈 Importar User
-from django.utils.html import strip_tags
-from decimal import Decimal
-from datetime import date
 import re
+from datetime import date
+from decimal import Decimal
+
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator, EmailValidator
+from django.db import models
+from django.utils.html import strip_tags
 
 # 🎓 CONCEPTO: Una clase = una tabla en la base de datos
 # Cada atributo = una columna
@@ -123,8 +124,8 @@ class Cliente(models.Model):
             validator = EmailValidator()
             try:
                 validator(self.email)
-            except ValidationError:
-                raise ValidationError({'email': 'Email inválido.'})
+            except ValidationError as exc:
+                raise ValidationError({'email': 'Email inválido.'}) from exc
         
         # Validar teléfono
         if self.telefono:
@@ -165,8 +166,6 @@ class Cliente(models.Model):
         """
         if not self.fecha_nacimiento:
             return None
-        
-        from datetime import date
         hoy = date.today()
         return hoy.year - self.fecha_nacimiento.year - (
             (hoy.month, hoy.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
@@ -478,8 +477,6 @@ class Reserva(models.Model):
         
         🐍 PYTHON: Método especial de Django para validar
         """
-        from datetime import date
-
         # 1. Validar que salida sea posterior a entrada (solo si ambas fechas existen)
         if self.fecha_entrada and self.fecha_salida:
             if self.fecha_salida <= self.fecha_entrada:

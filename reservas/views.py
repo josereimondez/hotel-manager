@@ -445,8 +445,7 @@ def via_kunig(request):
 
 def menu_del_dia(request):
     """Muestra el menú del día y los menús especiales activos hoy."""
-    from datetime import date as _date
-    hoy = _date.today()
+    hoy = date.today()
 
     menu = (
         MenuDelDia.objects

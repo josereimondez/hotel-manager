@@ -1,7 +1,6 @@
 """
 Middleware personalizado para manejar rate limiting.
 """
-from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django_ratelimit.exceptions import Ratelimited
 

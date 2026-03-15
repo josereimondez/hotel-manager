@@ -1,0 +1,30 @@
+[MAIN]
+# Carga el plugin de Django para evitar falsos positivos en ORM, fields, etc.
+load-plugins=pylint_django
+
+# Excluir migraciones (autogeneradas) y manage.py del análisis
+ignore-patterns=^[0-9].*\.py$,^manage\.py$
+
+[DJANGO]
+django-settings-module=hotel_project.settings
+
+[FORMAT]
+# Django usa líneas de hasta 120-130 caracteres habitualmente
+max-line-length=130
+
+[MESSAGES CONTROL]
+disable=
+    C0114,  # missing-module-docstring
+    C0115,  # missing-class-docstring
+    C0116,  # missing-function-docstring
+    C0303,  # trailing-whitespace (cosmético, editor lo gestiona)
+    R0903,  # too-few-public-methods (afecta clases Meta de Django)
+    W0622,  # redefining-built-in (id es parámetro estándar en vistas Django)
+    R1705,  # no-else-return (estilo)
+    R1710,  # inconsistent-return-statements (ver middleware)
+    W0718,  # broad-exception-caught (capturas intencionadas en vistas)
+    W0613,  # unused-argument (request no siempre se usa explícitamente en vistas)
+
+[DESIGN]
+# ViajeroCheckin tiene más de 7 atributos por requisito legal
+max-attributes=20

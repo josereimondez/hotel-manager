@@ -1,8 +1,8 @@
+import re
+
 from django import forms
 from django.contrib.auth.models import User
-from django.core.validators import RegexValidator
 from django.utils.html import strip_tags
-import re
 from .models import (Cliente, Reserva, MenuDelDia, PlatoMenuDelDia,
                      MenuEspecial, PlatoMenuEspecial, ViajeroCheckin)
 
@@ -526,8 +526,7 @@ class ReservaForm(forms.ModelForm):
 
         # 🔒 Validar disponibilidad: no solapar con reservas existentes
         if self.habitacion and fecha_entrada and fecha_salida:
-            from .models import Reserva as ReservaModel
-            solapadas = ReservaModel.objects.filter(
+            solapadas = Reserva.objects.filter(
                 habitacion=self.habitacion,
                 estado__in=['confirmada', 'en_curso', 'pendiente'],
                 fecha_entrada__lt=fecha_salida,
