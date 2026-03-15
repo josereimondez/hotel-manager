@@ -8,8 +8,12 @@ from django.contrib.auth import login, logout, authenticate, update_session_auth
 from django.http import JsonResponse
 from django.utils.html import strip_tags
 from django_ratelimit.decorators import ratelimit
-from .models import Habitacion, Cliente, Reserva
-from .forms import ClienteRegistroForm, ReservaForm, RegistroUsuarioForm, EditarUsuarioForm, EditarClienteForm, CambiarPasswordForm
+from .models import Habitacion, Cliente, Reserva, MenuDelDia, MenuEspecial
+from .forms import (ClienteRegistroForm, ReservaForm, RegistroUsuarioForm, EditarUsuarioForm,
+                    EditarClienteForm, CambiarPasswordForm, MenuDelDiaForm, PlatoFormSet,
+                    MenuEspecialForm, PlatoMenuEspecialFormSet, CheckinReservaForm,
+                    get_viajero_checkin_formset)
+
 
 # 🎓 CONCEPTO: Vistas = funciones que procesan requests y devuelven responses
 
@@ -173,7 +177,11 @@ def crear_reserva(request, habitacion_id):
                     request, 
                     f'¡Reserva creada! Código: {reserva.codigo_reserva}'
                 )
-                return redirect('detalle_reserva', id=reserva.id)
+                messages.info(
+                    request,
+                    'Completa ahora el check-in online para cumplir con el registro obligatorio de viajeros.'
+                )
+                return redirect('checkin_online_reserva', id=reserva.id)
                 
             except Exception as e:
                 messages.error(request, f'Error: {str(e)}')
@@ -240,6 +248,49 @@ def detalle_reserva(request, id):  # pylint: disable=redefined-builtin
     
     context = {'reserva': reserva}
     return render(request, 'reservas/detalle_reserva.html', context)
+
+
+@login_required
+def checkin_online_reserva(request, id):  # pylint: disable=redefined-builtin
+    """Check-in online legal de viajeros para una reserva existente."""
+    reserva = get_object_or_404(Reserva, id=id, cliente__usuario=request.user)
+    min_viajeros_requeridos = max(1, reserva.numero_adultos)
+    viajeros_existentes = reserva.viajeros_checkin.count()
+    formset_cls = get_viajero_checkin_formset(extra=max(0, min_viajeros_requeridos - viajeros_existentes))
+
+    if request.method == 'POST':
+        reserva_form = CheckinReservaForm(request.POST, instance=reserva)
+        formset = formset_cls(request.POST, instance=reserva, prefix='viajeros')
+
+        if reserva_form.is_valid() and formset.is_valid():
+            viajeros_validos = [
+                f for f in formset.forms
+                if f.cleaned_data and not f.cleaned_data.get('DELETE', False)
+            ]
+            if len(viajeros_validos) < min_viajeros_requeridos:
+                messages.error(
+                    request,
+                    f'Debes completar al menos {min_viajeros_requeridos} viajero(s) adulto(s) para esta reserva.'
+                )
+            else:
+                reserva = reserva_form.save(commit=False)
+                reserva.checkin_online_completado = True
+                reserva.save()
+                formset.save()
+                messages.success(request, '✅ Check-in online completado correctamente.')
+                return redirect('detalle_reserva', id=reserva.id)
+        else:
+            messages.error(request, 'Revisa los errores del check-in online.')
+    else:
+        reserva_form = CheckinReservaForm(instance=reserva)
+        formset = formset_cls(instance=reserva, prefix='viajeros')
+
+    return render(request, 'reservas/checkin_online.html', {
+        'reserva': reserva,
+        'reserva_form': reserva_form,
+        'formset': formset,
+        'min_viajeros_requeridos': min_viajeros_requeridos,
+    })
 
 
 @login_required  # 🔐 Requiere estar logueado
@@ -390,6 +441,112 @@ def via_kunig(request):
     Vista para la página de la Vía Künig.
     """
     return render(request, 'reservas/via_kunig.html')
+
+
+def menu_del_dia(request):
+    """Muestra el menú del día y los menús especiales activos hoy."""
+    from datetime import date as _date
+    hoy = _date.today()
+
+    menu = (
+        MenuDelDia.objects
+        .filter(activo=True, fecha=hoy)
+        .prefetch_related('platos')
+        .first()
+    )
+
+    primeros, segundos, postres = [], [], []
+    if menu:
+        primeros = menu.platos.filter(categoria='primero', disponible=True).order_by('orden', 'nombre')
+        segundos = menu.platos.filter(categoria='segundo', disponible=True).order_by('orden', 'nombre')
+        postres  = menu.platos.filter(categoria='postre',  disponible=True).order_by('orden', 'nombre')
+
+    especiales = (
+        MenuEspecial.objects
+        .filter(activo=True, fecha_inicio__lte=hoy, fecha_fin__gte=hoy)
+        .prefetch_related('platos')
+        .order_by('fecha_inicio')
+    )
+
+    return render(request, 'reservas/menu_del_dia.html', {
+        'menu': menu,
+        'primeros': primeros,
+        'segundos': segundos,
+        'postres': postres,
+        'especiales': especiales,
+    })
+
+
+@login_required
+def editar_menu_del_dia(request):
+    """Panel de edición del menú del día — solo para staff."""
+    if not request.user.is_staff:
+        messages.error(request, 'No tienes permisos para editar el menú del día.')
+        return redirect('menu_del_dia')
+
+    menu, _ = MenuDelDia.objects.get_or_create(
+        fecha=date.today(),
+        defaults={'activo': True},
+    )
+
+    if request.method == 'POST':
+        form = MenuDelDiaForm(request.POST, instance=menu)
+        formset = PlatoFormSet(request.POST, instance=menu, prefix='platos')
+
+        if form.is_valid() and formset.is_valid():
+            form.save()
+            formset.save()
+            messages.success(request, '✅ Menú del día actualizado correctamente.')
+            return redirect('menu_del_dia')
+        else:
+            messages.error(request, 'Revisa los errores del formulario.')
+    else:
+        form = MenuDelDiaForm(instance=menu)
+        formset = PlatoFormSet(instance=menu, prefix='platos')
+
+    return render(request, 'reservas/editar_menu_del_dia.html', {
+        'form': form,
+        'formset': formset,
+        'menu': menu,
+    })
+
+
+@login_required
+def crear_editar_menu_especial(request, pk=None):
+    """Crear (pk=None) o editar (pk=id) un menú especial — solo staff."""
+    if not request.user.is_staff:
+        messages.error(request, 'No tienes permisos para gestionar menús especiales.')
+        return redirect('menu_del_dia')
+
+    especial = get_object_or_404(MenuEspecial, pk=pk) if pk else None
+    es_nuevo = especial is None
+
+    if request.method == 'POST':
+        form = MenuEspecialForm(request.POST, instance=especial)
+        formset = PlatoMenuEspecialFormSet(request.POST, instance=especial or MenuEspecial(), prefix='platos')
+
+        if form.is_valid():
+            especial = form.save()
+            formset = PlatoMenuEspecialFormSet(request.POST, instance=especial, prefix='platos')
+            if formset.is_valid():
+                formset.save()
+                accion = 'creado' if es_nuevo else 'actualizado'
+                messages.success(request, f'✅ Menú especial {accion} correctamente.')
+                return redirect('menu_del_dia')
+            else:
+                messages.error(request, 'Revisa los errores en los platos.')
+        else:
+            messages.error(request, 'Revisa los errores del formulario.')
+    else:
+        form = MenuEspecialForm(instance=especial)
+        formset = PlatoMenuEspecialFormSet(instance=especial or MenuEspecial(), prefix='platos')
+
+    return render(request, 'reservas/editar_menu_especial.html', {
+        'form': form,
+        'formset': formset,
+        'especial': especial,
+        'es_nuevo': es_nuevo,
+    })
 
 
 @login_required

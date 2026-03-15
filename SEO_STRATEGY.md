@@ -20,7 +20,7 @@ Se ha implementado una estrategia SEO completa para **Hostal Rivera**, hostal co
 - Local SEO: Nombre negocio + ciudad + provincia
 
 ### Meta Description (≤ 155 caracteres)
-**Hostal con restaurante en Becerreá, Lugo. Alojamiento cómodo, menú del día, cocina gallega tradicional. Sierra de Los Ancares.**
+**Hostal con restaurante en Becerreá, Lugo. Alojamiento cómodo, menú del día, cocina gallega tradicional. Comarca de Ancares.**
 - Longitud: 125 caracteres ✅
 - Incluye: beneficios + keywords + ubicación
 
@@ -90,7 +90,7 @@ twitter:image = /static/og-image.jpg
 ### Párrafo Introductorio (220 palabras)
 Ubicado en el body de home.html, incluye:
 - Nombre del negocio: **Hostal Rivera**
-- Ubicaciones: **Becerreá, Lugo**, **Sierra de Los Ancares**, **Galicia**
+- Ubicaciones: **Becerreá, Lugo**, **Comarca de Los Ancares**, **Galicia**
 - Keywords naturales: alojamiento, restaurante, cocina gallega, menú del día
 - Beneficiarios: viajeros, turistas, trabajadores, familias
 - Diferenciadores: confort, autenticidad, asequible, productos locales
@@ -102,7 +102,7 @@ Ubicado en el body de home.html, incluye:
 - Galicia: 1 mención
 - Cocina gallega: 1 mención
 - Menú del día: 1 mención
-- Sierra de Los Ancares: 1 mención
+- Comarca de los Ancares: 1 mención
 
 ---
 

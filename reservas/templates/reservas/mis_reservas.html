@@ -34,9 +34,23 @@
                 <p class="text-primary fw-bold fs-5 mb-3">
                     {% trans "Total" %}: {{ reserva.precio_total }}€
                 </p>
-                <a href="{% url 'detalle_reserva' reserva.id %}" class="btn btn-outline-primary w-100">
-                    {% trans "Ver Detalles" %}
-                </a>
+                <p class="mb-2">
+                    {% if reserva.checkin_online_completado %}
+                        <span class="badge bg-success">{% trans "Check-in online completado" %}</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">{% trans "Check-in online pendiente" %}</span>
+                    {% endif %}
+                </p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'detalle_reserva' reserva.id %}" class="btn btn-outline-primary w-100">
+                        {% trans "Ver Detalles" %}
+                    </a>
+                    {% if not reserva.checkin_online_completado %}
+                        <a href="{% url 'checkin_online_reserva' reserva.id %}" class="btn btn-warning w-100">
+                            {% trans "Completar check-in" %}
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

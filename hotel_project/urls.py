@@ -20,9 +20,13 @@ from django.conf import settings  # 👈 Nuevo
 from django.conf.urls.static import static  # 👈 Nuevo
 from django.conf.urls.i18n import i18n_patterns  # 🌍 i18n
 from django.views.i18n import set_language  # 🌍 set_language view
+from decouple import config
+
+
+ADMIN_PATH = config('ADMIN_PATH', default='admin/').strip('/') + '/'
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path(ADMIN_PATH, admin.site.urls),
     path('i18n/set_language/', set_language, name='set_language'),  # 🌍 Cambiar idioma
 ]
 

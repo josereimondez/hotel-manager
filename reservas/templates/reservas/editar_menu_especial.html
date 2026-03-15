@@ -1,0 +1,237 @@
+{% extends "reservas/base.html" %}
+{% load i18n %}
+
+{% block title %}{% if es_nuevo %}Nuevo Menú Especial{% else %}Editar: {{ especial.titulo }}{% endif %} | Hostal Rivera{% endblock %}
+
+{% block extra_css %}
+<style>
+    .formset-row td { vertical-align: middle; }
+    .delete-cell { text-align: center; }
+    .row-to-delete td { opacity: .45; text-decoration: line-through; }
+    .formset-table th { font-size: .82rem; background: #f1f3f5; }
+    .formset-table td { padding: 6px 8px; }
+    .add-btn { font-size: .82rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Cabecera -->
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+    <div>
+        <h1 class="h3 mb-0 fw-bold">
+            ⭐ {% if es_nuevo %}Nuevo Menú Especial{% else %}Editar: {{ especial.titulo }}{% endif %}
+        </h1>
+        <p class="text-muted mb-0 small">Solo el staff puede acceder a esta página.</p>
+    </div>
+    <a href="{% url 'menu_del_dia' %}" class="btn btn-outline-secondary btn-sm">
+        ← Ver menú público
+    </a>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    <!-- ── Datos generales ──────────────────────────────────── -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header fw-semibold">📋 Datos del menú especial</div>
+        <div class="card-body">
+            <div class="row g-3">
+
+                <div class="col-12">
+                    <label class="form-label fw-semibold" for="{{ form.titulo.id_for_label }}">{{ form.titulo.label }}</label>
+                    {{ form.titulo }}
+                    {% if form.titulo.errors %}<div class="text-danger small">{{ form.titulo.errors }}</div>{% endif %}
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-semibold" for="{{ form.descripcion.id_for_label }}">{{ form.descripcion.label }}</label>
+                    {{ form.descripcion }}
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold" for="{{ form.precio.id_for_label }}">{{ form.precio.label }}</label>
+                    {{ form.precio }}
+                    {% if form.precio.errors %}<div class="text-danger small">{{ form.precio.errors }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold" for="{{ form.fecha_inicio.id_for_label }}">{{ form.fecha_inicio.label }}</label>
+                    {{ form.fecha_inicio }}
+                    {% if form.fecha_inicio.errors %}<div class="text-danger small">{{ form.fecha_inicio.errors }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold" for="{{ form.fecha_fin.id_for_label }}">{{ form.fecha_fin.label }}</label>
+                    {{ form.fecha_fin }}
+                    {% if form.fecha_fin.errors %}<div class="text-danger small">{{ form.fecha_fin.errors }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-3 d-flex align-items-end">
+                    <div class="form-check mb-2">
+                        {{ form.activo }}
+                        <label class="form-check-label fw-semibold" for="{{ form.activo.id_for_label }}">
+                            {{ form.activo.label }}
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold" for="{{ form.consumicion_incluida.id_for_label }}">{{ form.consumicion_incluida.label }}</label>
+                    {{ form.consumicion_incluida }}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold" for="{{ form.notas.id_for_label }}">{{ form.notas.label }}</label>
+                    {{ form.notas }}
+                </div>
+
+                {% if form.non_field_errors %}
+                <div class="col-12">
+                    <div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Platos (formset inline) ────────────────────────── -->
+    {{ formset.management_form }}
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-semibold">🥘 Platos del menú especial</div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm formset-table mb-0">
+                    <thead>
+                        <tr>
+                            <th style="min-width:130px">Categoría</th>
+                            <th style="min-width:200px">Nombre del plato</th>
+                            <th style="min-width:200px">Descripción</th>
+                            <th style="width:70px">Orden</th>
+                            <th style="width:80px" class="text-center">Disponible</th>
+                            <th style="width:60px" class="text-center">🗑</th>
+                        </tr>
+                    </thead>
+                    <tbody id="formset-tbody">
+                        {% for plato_form in formset %}
+                        <tr class="formset-row">
+                            {{ plato_form.id }}
+                            <td>{{ plato_form.categoria }}
+                                {% if plato_form.categoria.errors %}<div class="text-danger small">{{ plato_form.categoria.errors }}</div>{% endif %}
+                            </td>
+                            <td>{{ plato_form.nombre }}
+                                {% if plato_form.nombre.errors %}<div class="text-danger small">{{ plato_form.nombre.errors }}</div>{% endif %}
+                            </td>
+                            <td>{{ plato_form.descripcion }}</td>
+                            <td>{{ plato_form.orden }}</td>
+                            <td class="text-center">{{ plato_form.disponible }}</td>
+                            <td class="delete-cell">
+                                <label class="visually-hidden" for="{{ plato_form.DELETE.id_for_label }}">Eliminar</label>
+                                {{ plato_form.DELETE }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr id="empty-notice">
+                            <td colspan="6" class="text-center text-muted py-3">
+                                Aún no hay platos. Usa los botones de abajo para añadir.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Botones Añadir por categoría -->
+            <div class="d-flex flex-wrap gap-2 p-3 border-top bg-light">
+                <button type="button" class="btn btn-outline-success btn-sm add-btn" onclick="addPlato('primero')">
+                    + Añadir primer plato
+                </button>
+                <button type="button" class="btn btn-outline-primary btn-sm add-btn" onclick="addPlato('segundo')">
+                    + Añadir segundo plato
+                </button>
+                <button type="button" class="btn btn-outline-warning btn-sm add-btn" onclick="addPlato('postre')">
+                    + Añadir postre
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm add-btn" onclick="addPlato('extra')">
+                    + Añadir extra / maridaje
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones guardar/cancelar -->
+    <div class="d-flex gap-2 justify-content-end">
+        <a href="{% url 'menu_del_dia' %}" class="btn btn-outline-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-primary px-4">
+            💾 {% if es_nuevo %}Crear menú especial{% else %}Guardar cambios{% endif %}
+        </button>
+    </div>
+</form>
+
+<!-- Plantilla vacía para JS -->
+<template id="empty-form-tpl">
+    <tr class="formset-row">
+        {{ formset.empty_form.id }}
+        <td>{{ formset.empty_form.categoria }}</td>
+        <td>{{ formset.empty_form.nombre }}</td>
+        <td>{{ formset.empty_form.descripcion }}</td>
+        <td>{{ formset.empty_form.orden }}</td>
+        <td class="text-center">{{ formset.empty_form.disponible }}</td>
+        <td class="delete-cell">
+            <label class="visually-hidden">Eliminar</label>
+            {{ formset.empty_form.DELETE }}
+        </td>
+    </tr>
+</template>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    let formIndex = parseInt(document.getElementById('id_platos-TOTAL_FORMS').value, 10);
+
+    function addPlato(categoria) {
+        const notice = document.getElementById('empty-notice');
+        if (notice) notice.remove();
+
+        const tpl = document.getElementById('empty-form-tpl');
+        const clone = tpl.content.cloneNode(true);
+
+        clone.querySelectorAll('[name]').forEach(el => {
+            el.name = el.name.replace(/__prefix__/g, formIndex);
+        });
+        clone.querySelectorAll('[id]').forEach(el => {
+            el.id = el.id.replace(/__prefix__/g, formIndex);
+        });
+        clone.querySelectorAll('label[for]').forEach(el => {
+            el.htmlFor = el.htmlFor.replace(/__prefix__/g, formIndex);
+        });
+
+        const select = clone.querySelector('select[name$="-categoria"]');
+        if (select && categoria) select.value = categoria;
+
+        const deleteInput = clone.querySelector('input[type="checkbox"][name$="-DELETE"]');
+        if (deleteInput) deleteInput.addEventListener('change', toggleDeleteStyle);
+
+        document.getElementById('formset-tbody').appendChild(clone);
+        formIndex++;
+        document.getElementById('id_platos-TOTAL_FORMS').value = formIndex;
+    }
+
+    function toggleDeleteStyle(e) {
+        const row = e.target.closest('tr');
+        if (row) row.classList.toggle('row-to-delete', e.target.checked);
+    }
+
+    document.querySelectorAll('input[type="checkbox"][name$="-DELETE"]').forEach(cb => {
+        if (cb.checked) cb.closest('tr')?.classList.add('row-to-delete');
+        cb.addEventListener('change', toggleDeleteStyle);
+    });
+
+    window.addPlato = addPlato;
+})();
+</script>
+{% endblock %}

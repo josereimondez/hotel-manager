@@ -8,7 +8,7 @@
     
     <!-- 🔍 SEO Meta Tags -->
     <title>{% block title %}Hostal Rivera | Alojamiento y Restaurante en Becerreá, Lugo{% endblock %}</title>
-    <meta name="description" content="{% block description %}Hostal con restaurante en Becerreá, Lugo. Alojamiento cómodo, menú del día, cocina gallega tradicional. Ubicado en la Sierra de Los Ancares.{% endblock %}">
+    <meta name="description" content="{% block description %}Hostal con restaurante en Becerreá, Lugo. Alojamiento cómodo, menú del día, cocina gallega tradicional. Ubicado en la Comarca de Los Ancares.{% endblock %}">
     <meta name="keywords" content="hostal Becerreá, alojamiento Lugo, restaurante Becerreá, menú del día, Galicia">
     <meta name="author" content="Hostal Rivera">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
@@ -119,6 +119,157 @@
             border-color: var(--color-secondary);
             opacity: 0.4;
         }
+
+        /* ── Hamburguesa animada ────────────────────────────── */
+        .navbar-toggler {
+            border: 2px solid rgba(235,186,0,.55);
+            border-radius: .5rem;
+            padding: .35rem .6rem;
+            transition: border-color .2s;
+        }
+        .navbar-toggler:focus { box-shadow: 0 0 0 3px rgba(235,186,0,.3); }
+        .navbar-toggler:hover { border-color: var(--color-secondary); }
+        .nav-icon-bar {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            transition: transform .28s ease, opacity .2s ease;
+            margin: 5px 0;
+        }
+        .navbar-toggler[aria-expanded="true"] .nav-icon-bar:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+        .navbar-toggler[aria-expanded="true"] .nav-icon-bar:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+        .navbar-toggler[aria-expanded="true"] .nav-icon-bar:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* ── Drawer móvil ───────────────────────────────────── */
+        @media (max-width: 991.98px) {
+            #navbarNav {
+                background: rgba(11, 7, 58, 0.97);
+                backdrop-filter: blur(14px);
+                -webkit-backdrop-filter: blur(14px);
+                border-top: 1.5px solid rgba(235,186,0,.35);
+                border-radius: 0 0 1.25rem 1.25rem;
+                padding: .5rem .25rem 1.1rem;
+                margin: 0 -.75rem;
+                box-shadow: 0 12px 40px rgba(0,0,0,.5);
+                animation: drawerIn .22s ease-out;
+            }
+            @keyframes drawerIn {
+                from { opacity:0; transform: translateY(-10px); }
+                to   { opacity:1; transform: translateY(0); }
+            }
+
+            /* Divisor decorativo */
+            .nav-divider {
+                height: 1px;
+                background: rgba(255,255,255,.08);
+                margin: .5rem 1rem;
+            }
+
+            /* ─ Links de navegación ─ */
+            #navbarNav .nav-item { width: 100%; }
+
+            #navbarNav .nav-link {
+                color: rgba(255,255,255,.87) !important;
+                font-size: .96rem;
+                font-weight: 500;
+                padding: .72rem 1.1rem !important;
+                margin: .1rem .5rem !important;
+                border-radius: .6rem !important;
+                display: flex;
+                align-items: center;
+                gap: .5rem;
+                transition: background .15s, color .15s;
+                letter-spacing: .01em;
+            }
+            #navbarNav .nav-link:hover,
+            #navbarNav .nav-link:focus {
+                background: rgba(235,186,0,.12);
+                color: var(--color-secondary) !important;
+            }
+
+            /* ─ Botones de acción ─ */
+            #navbarNav .nav-link.btn {
+                display: flex !important;
+                justify-content: center;
+                margin: .25rem .75rem !important;
+                width: calc(100% - 1.5rem) !important;
+                border-radius: .65rem !important;
+                padding: .72rem 1rem !important;
+                font-size: .95rem;
+                font-weight: 600;
+            }
+            #navbarNav .nav-link.btn-outline-light {
+                border-color: rgba(235,186,0,.6) !important;
+                color: #fff !important;
+                background: transparent !important;
+            }
+            #navbarNav .nav-link.btn-outline-light:hover {
+                background: rgba(235,186,0,.14) !important;
+            }
+            #navbarNav .nav-link.btn-light,
+            #navbarNav .nav-link.btn-warning {
+                background: var(--color-secondary) !important;
+                border-color: var(--color-secondary) !important;
+                color: var(--color-primary) !important;
+            }
+            #navbarNav .nav-link.btn-light:hover,
+            #navbarNav .nav-link.btn-warning:hover {
+                background: var(--color-secondary-dark) !important;
+            }
+
+            /* ─ Selector de idioma como chips ─ */
+            #navbarNav .nav-item.dropdown { margin: 0 !important; }
+
+            #navbarNav .dropdown-toggle {
+                justify-content: space-between !important;
+            }
+
+            #navbarNav .dropdown-menu {
+                position: static !important;
+                background: transparent;
+                border: none;
+                border-radius: .5rem;
+                margin: .1rem .75rem .4rem !important;
+                width: calc(100% - 1.5rem);
+                /* chips en fila */
+                display: none;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: .45rem;
+                padding: .4rem 0;
+            }
+            #navbarNav .dropdown-menu.show {
+                display: flex !important;
+            }
+            #navbarNav .dropdown-menu li { flex: 1 1 30%; }
+            #navbarNav .dropdown-menu .dropdown-item,
+            #navbarNav .dropdown-menu button.dropdown-item {
+                text-align: center;
+                border-radius: .55rem;
+                background: rgba(255,255,255,.07);
+                color: rgba(255,255,255,.82);
+                border: 1px solid rgba(255,255,255,.13);
+                padding: .5rem .4rem;
+                font-size: .87rem;
+                width: 100%;
+                transition: background .15s, border-color .15s;
+            }
+            #navbarNav .dropdown-menu .dropdown-item:hover,
+            #navbarNav .dropdown-menu button.dropdown-item:hover {
+                background: rgba(235,186,0,.22);
+                border-color: rgba(235,186,0,.5);
+                color: #fff;
+            }
+        }
     </style>
     
     <!-- 📊 JSON-LD Schema Markup -->
@@ -182,34 +333,41 @@
                 <img src="{% static 'images/logo/logo.png' %}" alt="Logo Hostal Rivera" style="height:42px; width:auto; object-fit:contain;">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+                <span class="nav-icon-bar"></span>
+                <span class="nav-icon-bar"></span>
+                <span class="nav-icon-bar"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">{% trans "Inicio" %}</a>
+                        <a class="nav-link" href="{% url 'home' %}">🏠 {% trans "Inicio" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'listado_habitaciones' %}">{% trans "Habitaciones" %}</a>
+                        <a class="nav-link" href="{% url 'listado_habitaciones' %}">🛏️ {% trans "Habitaciones" %}</a>
                     </li>
-                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'menu_del_dia' %}">🍽️ {% trans "Menú del Día" %}</a>
+                    </li>
+
+                    <li class="d-lg-none"><div class="nav-divider"></div></li>
+
                     {% if user.is_authenticated %}
                         <!-- 🔒 Usuario autenticado -->
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'mis_reservas' %}">{% trans "Mis Reservas" %}</a>
+                            <a class="nav-link" href="{% url 'mis_reservas' %}">📋 {% trans "Mis Reservas" %}</a>
                         </li>
                         
                         {% if user.is_staff %}
                             <!-- 👑 Usuario administrador/staff -->
                             <li class="nav-item">
-                                <a class="nav-link btn btn-warning ms-2" href="/admin/" target="_blank">
-                                    ⚙️ {% trans "Panel Admin" %}
+                                <a class="nav-link btn btn-warning ms-2" href="{% url 'admin:index' %}" target="_blank">
+                                    ⚙️ {% trans "Panel Admin" %} ↗
                                 </a>
                             </li>
                         {% endif %}
                         
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'mi_perfil' %}">👤 {{ user.username }}</a>
+                            <a class="nav-link" href="{% url 'mi_perfil' %}">👤 <span class="text-truncate" style="max-width:120px;display:inline-block;vertical-align:middle;">{{ user.username }}</span></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link btn btn-outline-light ms-2" href="{% url 'logout' %}">

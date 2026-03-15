@@ -23,6 +23,7 @@ urlpatterns = [
     # Reservas
     path('reservar/<int:habitacion_id>/', views.crear_reserva, name='crear_reserva'),
     path('reserva/<int:id>/', views.detalle_reserva, name='detalle_reserva'),
+    path('reserva/<int:id>/checkin-online/', views.checkin_online_reserva, name='checkin_online_reserva'),
     path('mis-reservas/', views.mis_reservas, name='mis_reservas'),
     
     # 📋 Páginas Legales (RGPD, LSSI-CE)
@@ -32,6 +33,12 @@ urlpatterns = [
 
     # SEO: Página sobre la Vía Künig
     path('via-kunig/', views.via_kunig, name='via_kunig'),
+
+    # Restaurante
+    path('menu-del-dia/', views.menu_del_dia, name='menu_del_dia'),
+    path('menu-del-dia/editar/', views.editar_menu_del_dia, name='editar_menu_del_dia'),
+    path('menu-especial/nuevo/', views.crear_editar_menu_especial, name='crear_menu_especial'),
+    path('menu-especial/<int:pk>/editar/', views.crear_editar_menu_especial, name='editar_menu_especial'),
 
     # Perfil de usuario
     path('perfil/', views.mi_perfil, name='mi_perfil'),

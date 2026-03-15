@@ -82,12 +82,24 @@
                 <div class="alert alert-info mt-4">
                     <strong>{% trans "Importante:" %}</strong> {% trans "Te hemos enviado un email de confirmación a" %} {{ reserva.cliente.email }}
                 </div>
+
+                <div class="alert {% if reserva.checkin_online_completado %}alert-success{% else %}alert-warning{% endif %} mt-3">
+                    <strong>{% trans "Check-in online:" %}</strong>
+                    {% if reserva.checkin_online_completado %}
+                        {% trans "Completado. Datos listos para comunicación a SES Hospedajes." %}
+                    {% else %}
+                        {% trans "Pendiente. Debes completar los datos de viajeros obligatorios." %}
+                    {% endif %}
+                </div>
             </div>
         </div>
         
         <div class="text-center mt-4">
             <a href="{% url 'home' %}" class="btn btn-primary">{% trans "Volver al Inicio" %}</a>
             <a href="{% url 'mis_reservas' %}" class="btn btn-outline-secondary">{% trans "Ver Mis Reservas" %}</a>
+            {% if not reserva.checkin_online_completado %}
+                <a href="{% url 'checkin_online_reserva' reserva.id %}" class="btn btn-warning">{% trans "Completar Check-in Online" %}</a>
+            {% endif %}
         </div>
     </div>
 </div>

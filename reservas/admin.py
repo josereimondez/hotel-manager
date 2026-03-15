@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html  # 👈 Para mostrar HTML
-from .models import Habitacion, Cliente, Reserva  # 👈 Importar todos los modelos
+from .models import (Habitacion, Cliente, Reserva, MenuDelDia, PlatoMenuDelDia,
+                     MenuEspecial, PlatoMenuEspecial, ViajeroCheckin)
 
 # 🎓 CONCEPTO: Personalizar el panel de administración
 
@@ -130,10 +131,22 @@ class ClienteAdmin(admin.ModelAdmin):
 
 
 # 📅 ADMIN DE RESERVAS
+class ViajeroCheckinInline(admin.TabularInline):
+    model = ViajeroCheckin
+    extra = 0
+    fields = [
+        'orden', 'nombre', 'primer_apellido', 'segundo_apellido',
+        'tipo_documento', 'numero_documento', 'numero_soporte',
+        'nacionalidad', 'fecha_nacimiento', 'telefono_contacto',
+        'relacion_con_titular', 'es_menor_sin_documento', 'parentesco_menor_con_adulto'
+    ]
+
+
 @admin.register(Reserva)
 class ReservaAdmin(admin.ModelAdmin):
     list_display = ['codigo_reserva', 'cliente', 'habitacion', 'fecha_entrada', 'fecha_salida', 
-                    'noches_display', 'precio_total', 'estado', 'pagado']
+                    'noches_display', 'precio_total', 'estado', 'pagado',
+                    'checkin_online_completado', 'ses_hospedajes_enviado']
     list_filter = ['estado', 'pagado', 'fecha_entrada', 'fecha_reserva']
     search_fields = ['cliente__nombre', 'cliente__apellidos', 'cliente__dni_nie', 'habitacion__numero']
     readonly_fields = ['codigo_reserva', 'noches_display', 'precio_total', 'fecha_reserva']
@@ -149,6 +162,13 @@ class ReservaAdmin(admin.ModelAdmin):
         ('Huéspedes', {
             'fields': ('numero_adultos', 'numero_ninos')
         }),
+        ('Registro legal viajeros', {
+            'fields': (
+                'medio_pago', 'iban', 'relaciones_parentesco_adultos',
+                'contrato_aceptado', 'checkin_online_completado',
+                'ses_hospedajes_enviado', 'ses_hospedajes_referencia'
+            )
+        }),
         ('Precio', {
             'fields': ('precio_por_noche', 'precio_total', 'pagado')
         }),
@@ -160,6 +180,7 @@ class ReservaAdmin(admin.ModelAdmin):
     
     # Autocompletar campos relacionados (más rápido)
     autocomplete_fields = ['cliente', 'habitacion']
+    inlines = [ViajeroCheckinInline]
     
     def noches_display(self, obj):
         """Muestra número de noches"""
@@ -172,3 +193,42 @@ class ReservaAdmin(admin.ModelAdmin):
             return obj.codigo_reserva
         return "Se generará al guardar"
     codigo_reserva.short_description = "Código"
+
+
+@admin.register(ViajeroCheckin)
+class ViajeroCheckinAdmin(admin.ModelAdmin):
+    list_display = ['reserva', 'orden', 'nombre', 'primer_apellido', 'tipo_documento', 'numero_documento']
+    list_filter = ['tipo_documento', 'sexo', 'nacionalidad', 'es_menor_sin_documento']
+    search_fields = ['nombre', 'primer_apellido', 'numero_documento', 'reserva__id']
+
+
+class PlatoMenuDelDiaInline(admin.TabularInline):
+    model = PlatoMenuDelDia
+    extra = 1
+    fields = ['categoria', 'nombre', 'descripcion', 'orden', 'disponible']
+    ordering = ['categoria', 'orden']
+
+
+@admin.register(MenuDelDia)
+class MenuDelDiaAdmin(admin.ModelAdmin):
+    list_display = ['fecha', 'activo', 'consumicion_incluida']
+    list_filter = ['activo', 'fecha']
+    search_fields = ['consumicion_incluida', 'notas', 'platos__nombre']
+    ordering = ['-fecha']
+    inlines = [PlatoMenuDelDiaInline]
+
+
+class PlatoMenuEspecialInline(admin.TabularInline):
+    model = PlatoMenuEspecial
+    extra = 1
+    fields = ['categoria', 'nombre', 'descripcion', 'orden', 'disponible']
+    ordering = ['categoria', 'orden']
+
+
+@admin.register(MenuEspecial)
+class MenuEspecialAdmin(admin.ModelAdmin):
+    list_display = ['titulo', 'fecha_inicio', 'fecha_fin', 'precio', 'activo']
+    list_filter = ['activo', 'fecha_inicio']
+    search_fields = ['titulo', 'descripcion', 'platos__nombre']
+    ordering = ['-fecha_inicio']
+    inlines = [PlatoMenuEspecialInline]

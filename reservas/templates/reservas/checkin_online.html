@@ -1,0 +1,192 @@
+{% extends 'reservas/base.html' %}
+{% load i18n %}
+
+{% block title %}Check-in Online - {{ reserva.codigo_reserva }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <h1 class="h3 mb-2">{% trans "Check-in online" %}</h1>
+                    <p class="text-muted mb-0">
+                        {% trans "Reserva" %} <strong>{{ reserva.codigo_reserva }}</strong> ·
+                        {% trans "Entrada" %}: {{ reserva.fecha_entrada|date:"d/m/Y" }} ·
+                        {% trans "Salida" %}: {{ reserva.fecha_salida|date:"d/m/Y" }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="alert alert-warning" role="alert">
+                <strong>{% trans "Registro obligatorio" %}:</strong>
+                {% trans "Debes completar al menos" %} {{ min_viajeros_requeridos }} {% trans "viajero(s) adulto(s)." %}
+                {% trans "Si hay menores sin documento, indica su parentesco con el adulto responsable." %}
+            </div>
+
+            {% if formset.non_form_errors %}
+                <div class="alert alert-danger">
+                    {{ formset.non_form_errors }}
+                </div>
+            {% endif %}
+
+            <form method="post" class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    {% csrf_token %}
+
+                    <h2 class="h5 mb-3">{% trans "Datos de contrato" %}</h2>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">{{ reserva_form.relaciones_parentesco_adultos.label }}</label>
+                        {{ reserva_form.relaciones_parentesco_adultos }}
+                        {% if reserva_form.relaciones_parentesco_adultos.errors %}
+                            <div class="text-danger small mt-1">{{ reserva_form.relaciones_parentesco_adultos.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-check mb-4">
+                        {{ reserva_form.contrato_aceptado }}
+                        <label class="form-check-label" for="{{ reserva_form.contrato_aceptado.id_for_label }}">
+                            {{ reserva_form.contrato_aceptado.label }}
+                        </label>
+                        {% if reserva_form.contrato_aceptado.errors %}
+                            <div class="text-danger small mt-1">{{ reserva_form.contrato_aceptado.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <h2 class="h5 mb-3">{% trans "Viajeros" %}</h2>
+                    {{ formset.management_form }}
+
+                    {% for form in formset %}
+                        <div class="border rounded p-3 mb-3 bg-light-subtle">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h3 class="h6 m-0">{% trans "Viajero" %} {{ forloop.counter }}</h3>
+                                {% if form.instance.pk %}
+                                    <div class="form-check">
+                                        {{ form.DELETE }}
+                                        <label class="form-check-label small" for="{{ form.DELETE.id_for_label }}">{% trans "Eliminar" %}</label>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>
+                            {% endif %}
+
+                            {% for hidden in form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+
+                            <div class="row g-3">
+                                <div class="col-md-2">
+                                    <label class="form-label small">{{ form.orden.label }}</label>
+                                    {{ form.orden }}
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label small">{{ form.nombre.label }}</label>
+                                    {{ form.nombre }}
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label small">{{ form.primer_apellido.label }}</label>
+                                    {{ form.primer_apellido }}
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label small">{{ form.segundo_apellido.label }}</label>
+                                    {{ form.segundo_apellido }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">{{ form.sexo.label }}</label>
+                                    {{ form.sexo }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">{{ form.nacionalidad.label }}</label>
+                                    {{ form.nacionalidad }}
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label small">{{ form.tipo_documento.label }}</label>
+                                    {{ form.tipo_documento }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">{{ form.numero_documento.label }}</label>
+                                    {{ form.numero_documento }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">{{ form.numero_soporte.label }}</label>
+                                    {{ form.numero_soporte }}
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label small">{{ form.fecha_nacimiento.label }}</label>
+                                    {{ form.fecha_nacimiento }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">{{ form.telefono_contacto.label }}</label>
+                                    {{ form.telefono_contacto }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">{{ form.email_contacto.label }}</label>
+                                    {{ form.email_contacto }}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label small">{{ form.direccion_residencia.label }}</label>
+                                    {{ form.direccion_residencia }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small">{{ form.ciudad_residencia.label }}</label>
+                                    {{ form.ciudad_residencia }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small">{{ form.codigo_postal_residencia.label }}</label>
+                                    {{ form.codigo_postal_residencia }}
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label small">{{ form.pais_residencia.label }}</label>
+                                    {{ form.pais_residencia }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">{{ form.relacion_con_titular.label }}</label>
+                                    {{ form.relacion_con_titular }}
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <div class="form-check">
+                                        {{ form.es_menor_sin_documento }}
+                                        <label class="form-check-label" for="{{ form.es_menor_sin_documento.id_for_label }}">
+                                            {{ form.es_menor_sin_documento.label }}
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label small">{{ form.parentesco_menor_con_adulto.label }}</label>
+                                    {{ form.parentesco_menor_con_adulto }}
+                                </div>
+                            </div>
+
+                            {% for field in form.visible_fields %}
+                                {% if field.errors %}
+                                    <div class="text-danger small mt-2">{{ field.label }}: {{ field.errors|striptags }}</div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    {% if reserva_form.non_field_errors %}
+                        <div class="alert alert-danger">{{ reserva_form.non_field_errors }}</div>
+                    {% endif %}
+
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'detalle_reserva' reserva.id %}" class="btn btn-outline-secondary">
+                            {% trans "Volver" %}
+                        </a>
+                        <button type="submit" class="btn btn-primary ms-auto">
+                            {% trans "Guardar check-in online" %}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

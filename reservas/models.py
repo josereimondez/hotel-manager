@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User  # 👈 Importar User
 from django.utils.html import strip_tags
 from decimal import Decimal
+from datetime import date
 import re
 
 # 🎓 CONCEPTO: Una clase = una tabla en la base de datos
@@ -380,6 +381,47 @@ class Reserva(models.Model):
         choices=ESTADO_CHOICES,
         default='pendiente'
     )
+
+    # 📄 Datos adicionales para SES Hospedajes
+    MEDIO_PAGO_CHOICES = [
+        ('tarjeta', 'Tarjeta'),
+        ('transferencia', 'Transferencia bancaria'),
+        ('efectivo', 'Efectivo'),
+        ('bizum', 'Bizum'),
+        ('otro', 'Otro'),
+    ]
+    medio_pago = models.CharField(
+        max_length=20,
+        choices=MEDIO_PAGO_CHOICES,
+        blank=True,
+        help_text='Medio de pago informado por el viajero principal.'
+    )
+    iban = models.CharField(
+        max_length=34,
+        blank=True,
+        help_text='IBAN asociado a la transacción (si aplica).'
+    )
+    relaciones_parentesco_adultos = models.TextField(
+        blank=True,
+        help_text='Relación de parentesco entre viajeros mayores de edad.'
+    )
+    contrato_aceptado = models.BooleanField(
+        default=False,
+        help_text='Consentimiento del contrato de hospedaje.'
+    )
+    checkin_online_completado = models.BooleanField(
+        default=False,
+        help_text='Indica si se completó el check-in online legal.'
+    )
+    ses_hospedajes_enviado = models.BooleanField(
+        default=False,
+        help_text='Indica si el parte fue enviado al servicio web SES Hospedajes.'
+    )
+    ses_hospedajes_referencia = models.CharField(
+        max_length=120,
+        blank=True,
+        help_text='Referencia o identificador devuelto por SES Hospedajes.'
+    )
     
     # 📝 INFORMACIÓN ADICIONAL
     observaciones = models.TextField(
@@ -453,6 +495,13 @@ class Reserva(models.Model):
                 raise ValidationError(
                     f'La habitación solo tiene capacidad para {self.habitacion.capacidad} personas'
                 )
+
+        # 3.1 Validar IBAN básico si se informa
+        if self.iban:
+            iban_limpio = self.iban.replace(' ', '').upper()
+            if not re.match(r'^[A-Z]{2}[0-9A-Z]{13,32}$', iban_limpio):
+                raise ValidationError({'iban': 'IBAN inválido.'})
+            self.iban = iban_limpio
         
         # 4. Validar disponibilidad (no solapar reservas)
         if hasattr(self, 'habitacion') and self.habitacion and self.fecha_entrada and self.fecha_salida:
@@ -509,6 +558,234 @@ class Reserva(models.Model):
         #         name='fecha_salida_posterior_entrada'
         #     )
         # ]
+
+
+class ViajeroCheckin(models.Model):
+    """Datos legales de cada viajero para check-in online y SES Hospedajes."""
+
+    SEXO_CHOICES = [
+        ('M', 'Masculino'),
+        ('F', 'Femenino'),
+        ('X', 'No especificado'),
+    ]
+    TIPO_DOCUMENTO_CHOICES = [
+        ('dni', 'DNI'),
+        ('nie', 'NIE/TIE'),
+        ('pasaporte', 'Pasaporte'),
+        ('otro', 'Otro documento'),
+    ]
+    RELACION_CHOICES = [
+        ('titular', 'Titular de la reserva'),
+        ('conyuge', 'Cónyuge/pareja'),
+        ('hijo', 'Hijo/a'),
+        ('padre_madre', 'Padre/Madre'),
+        ('familiar', 'Familiar'),
+        ('amigo', 'Amigo/a'),
+        ('otro', 'Otro'),
+    ]
+
+    reserva = models.ForeignKey(
+        Reserva,
+        on_delete=models.CASCADE,
+        related_name='viajeros_checkin'
+    )
+    orden = models.PositiveSmallIntegerField(default=1)
+
+    nombre = models.CharField(max_length=100)
+    primer_apellido = models.CharField(max_length=100)
+    segundo_apellido = models.CharField(max_length=100, blank=True)
+    sexo = models.CharField(max_length=1, choices=SEXO_CHOICES)
+
+    tipo_documento = models.CharField(max_length=20, choices=TIPO_DOCUMENTO_CHOICES)
+    numero_documento = models.CharField(max_length=30, blank=True)
+    numero_soporte = models.CharField(max_length=30, blank=True)
+
+    nacionalidad = models.CharField(max_length=80)
+    fecha_nacimiento = models.DateField()
+
+    direccion_residencia = models.CharField(max_length=200)
+    ciudad_residencia = models.CharField(max_length=100)
+    codigo_postal_residencia = models.CharField(max_length=12)
+    pais_residencia = models.CharField(max_length=80, default='España')
+
+    telefono_contacto = models.CharField(max_length=20)
+    email_contacto = models.EmailField()
+
+    relacion_con_titular = models.CharField(max_length=20, choices=RELACION_CHOICES, default='titular')
+    es_menor_sin_documento = models.BooleanField(default=False)
+    parentesco_menor_con_adulto = models.CharField(max_length=120, blank=True)
+
+    creado_en = models.DateTimeField(auto_now_add=True)
+    actualizado_en = models.DateTimeField(auto_now=True)
+
+    def clean(self):
+        super().clean()
+
+        self.nombre = strip_tags(self.nombre).strip()
+        self.primer_apellido = strip_tags(self.primer_apellido).strip()
+        self.segundo_apellido = strip_tags(self.segundo_apellido).strip()
+        self.numero_documento = strip_tags(self.numero_documento).strip().upper()
+        self.numero_soporte = strip_tags(self.numero_soporte).strip().upper()
+        self.nacionalidad = strip_tags(self.nacionalidad).strip()
+        self.direccion_residencia = strip_tags(self.direccion_residencia).strip()
+        self.ciudad_residencia = strip_tags(self.ciudad_residencia).strip()
+        self.codigo_postal_residencia = strip_tags(self.codigo_postal_residencia).strip()
+        self.pais_residencia = strip_tags(self.pais_residencia).strip()
+        self.telefono_contacto = strip_tags(self.telefono_contacto).strip()
+        self.parentesco_menor_con_adulto = strip_tags(self.parentesco_menor_con_adulto).strip()
+
+        if self.es_menor_sin_documento:
+            if not self.parentesco_menor_con_adulto:
+                raise ValidationError({
+                    'parentesco_menor_con_adulto': (
+                        'Debes indicar la relación del menor con el adulto responsable.'
+                    )
+                })
+        else:
+            if not self.numero_documento:
+                raise ValidationError({'numero_documento': 'El número de documento es obligatorio.'})
+            if not self.numero_soporte:
+                raise ValidationError({'numero_soporte': 'El número de soporte es obligatorio.'})
+
+        if self.tipo_documento == 'dni' and self.numero_documento:
+            validar_dni_nie(self.numero_documento)
+
+        telefono_limpio = re.sub(r'[^0-9+]', '', self.telefono_contacto)
+        if len(telefono_limpio) < 9:
+            raise ValidationError({'telefono_contacto': 'Teléfono inválido. Debe tener al menos 9 dígitos.'})
+
+    def __str__(self):
+        return f"{self.nombre} {self.primer_apellido} - {self.reserva.codigo_reserva}"
+
+    class Meta:
+        verbose_name = 'Viajero de check-in'
+        verbose_name_plural = 'Viajeros de check-in'
+        ordering = ['orden', 'id']
+        unique_together = [('reserva', 'orden')]
+
+
+class MenuDelDia(models.Model):
+    """Menú diario del restaurante."""
+
+    fecha = models.DateField(
+        default=date.today,
+        unique=True,
+        help_text="Fecha del menú"
+    )
+    activo = models.BooleanField(
+        default=True,
+        help_text="Si hay varios menús activos, se muestra el más reciente"
+    )
+    consumicion_incluida = models.CharField(
+        max_length=120,
+        default="Incluye una consumición: vino, cerveza, refresco o agua"
+    )
+    notas = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Menú del día {self.fecha}"
+
+    class Meta:
+        verbose_name = "Menú del día"
+        verbose_name_plural = "Menús del día"
+        ordering = ['-fecha']
+
+
+class PlatoMenuDelDia(models.Model):
+    """Platos asociados al menú diario."""
+
+    CATEGORIA_CHOICES = [
+        ('primero', 'Primer plato'),
+        ('segundo', 'Segundo plato'),
+        ('postre', 'Postre'),
+    ]
+
+    menu = models.ForeignKey(
+        MenuDelDia,
+        on_delete=models.CASCADE,
+        related_name='platos'
+    )
+    categoria = models.CharField(max_length=10, choices=CATEGORIA_CHOICES)
+    nombre = models.CharField(max_length=120)
+    descripcion = models.CharField(max_length=255, blank=True)
+    orden = models.PositiveSmallIntegerField(default=1)
+    disponible = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.get_categoria_display()}: {self.nombre}"
+
+    class Meta:
+        verbose_name = "Plato del menú del día"
+        verbose_name_plural = "Platos del menú del día"
+        ordering = ['categoria', 'orden', 'nombre']
+
+
+class MenuEspecial(models.Model):
+    """Menú especial del restaurante (eventos, temporada, degustación…)."""
+
+    titulo = models.CharField(
+        max_length=120,
+        help_text="Ej: Menú de Semana Santa, Menú Degustación Gallego…"
+    )
+    descripcion = models.TextField(
+        blank=True,
+        help_text="Descripción breve del menú especial"
+    )
+    precio = models.DecimalField(
+        max_digits=6, decimal_places=2,
+        null=True, blank=True,
+        help_text="Precio por persona (dejar vacío si no aplica)"
+    )
+    fecha_inicio = models.DateField(
+        help_text="Primer día en que se ofrece el menú especial"
+    )
+    fecha_fin = models.DateField(
+        help_text="Último día en que se ofrece el menú especial"
+    )
+    activo = models.BooleanField(default=True)
+    consumicion_incluida = models.CharField(
+        max_length=120, blank=True,
+        help_text="Ej: Vino de la casa incluido"
+    )
+    notas = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.titulo
+
+    class Meta:
+        verbose_name = "Menú especial"
+        verbose_name_plural = "Menús especiales"
+        ordering = ['fecha_inicio']
+
+
+class PlatoMenuEspecial(models.Model):
+    """Platos asociados a un menú especial."""
+
+    CATEGORIA_CHOICES = [
+        ('primero', 'Primer plato'),
+        ('segundo', 'Segundo plato'),
+        ('postre', 'Postre'),
+        ('extra', 'Extra / Maridaje'),
+    ]
+
+    menu = models.ForeignKey(
+        MenuEspecial,
+        on_delete=models.CASCADE,
+        related_name='platos'
+    )
+    categoria = models.CharField(max_length=10, choices=CATEGORIA_CHOICES)
+    nombre = models.CharField(max_length=120)
+    descripcion = models.CharField(max_length=255, blank=True)
+    orden = models.PositiveSmallIntegerField(default=1)
+    disponible = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.get_categoria_display()}: {self.nombre}"
+
+    class Meta:
+        verbose_name = "Plato del menú especial"
+        verbose_name_plural = "Platos del menú especial"
+        ordering = ['categoria', 'orden', 'nombre']
 
 
 # 🎓 RESUMEN DE CONCEPTOS PYTHON:

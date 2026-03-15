@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 from decouple import config, Csv
-import os
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +22,32 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-CHANGE-THIS-IN-PRODUCTION')
+DEFAULT_INSECURE_SECRET = 'django-insecure-CHANGE-THIS-IN-PRODUCTION'
+SECRET_KEY = config('SECRET_KEY', default=DEFAULT_INSECURE_SECRET)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+if not DEBUG and (
+    not SECRET_KEY
+    or SECRET_KEY == DEFAULT_INSECURE_SECRET
+    or SECRET_KEY.startswith('django-insecure-')
+):
+    raise ImproperlyConfigured(
+        'SECRET_KEY insegura para producción. Define una clave robusta en .env.'
+    )
+
+ALLOWED_HOSTS = [
+    host for host in config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv()) if host
+]
+CSRF_TRUSTED_ORIGINS = [
+    origin for origin in config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv()) if origin
+]
+
+if not DEBUG and not ALLOWED_HOSTS:
+    raise ImproperlyConfigured(
+        'ALLOWED_HOSTS vacío en producción. Define hosts válidos en .env.'
+    )
 
 
 # Application definition
@@ -45,6 +65,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',  # 🌍 i18n - Debe estar después de SessionMiddleware
     'django.middleware.common.CommonMiddleware',
@@ -87,6 +108,8 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD', default=''),
         'HOST': config('DB_HOST', default=''),
         'PORT': config('DB_PORT', default=''),
+        'CONN_MAX_AGE': config('DB_CONN_MAX_AGE', default=60, cast=int),
+        'CONN_HEALTH_CHECKS': config('DB_CONN_HEALTH_CHECKS', default=True, cast=bool),
     }
 }
 
@@ -131,6 +154,9 @@ USE_L10N = True  # Localización
 
 USE_TZ = True
 
+# Use BigAutoField for implicit primary keys in new models/apps.
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
@@ -144,6 +170,7 @@ STATICFILES_DIRS = [
 
 # Para producción - Carpeta donde collectstatic recopila todos los archivos estáticos
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # 📂 Media files (archivos subidos por usuarios)
 # 🎓 CONCEPTO: MEDIA = fotos, PDFs, etc. subidos por usuarios
@@ -158,17 +185,37 @@ LOGOUT_REDIRECT_URL = 'home'  # 👈 Redirigir al home después de logout
 # 🔒 Configuración de seguridad para producción
 # Estas configuraciones se activan automáticamente cuando DEBUG=False
 if not DEBUG:
+    # Si hay reverse proxy (Nginx/Traefik), habilitar esta opción en .env
+    if config('BEHIND_PROXY', default=False, cast=bool):
+        SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
     # HTTPS/SSL
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
+    SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=True, cast=bool)
+    CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=True, cast=bool)
+    SESSION_COOKIE_HTTPONLY = config('SESSION_COOKIE_HTTPONLY', default=True, cast=bool)
+    CSRF_COOKIE_HTTPONLY = config('CSRF_COOKIE_HTTPONLY', default=True, cast=bool)
+
+    SESSION_COOKIE_SAMESITE = config('SESSION_COOKIE_SAMESITE', default='Lax')
+    CSRF_COOKIE_SAMESITE = config('CSRF_COOKIE_SAMESITE', default='Lax')
+
+    valid_samesite = {'Lax', 'Strict', 'None'}
+    if SESSION_COOKIE_SAMESITE not in valid_samesite:
+        raise ImproperlyConfigured(
+            'SESSION_COOKIE_SAMESITE inválido. Usa Lax, Strict o None.'
+        )
+    if CSRF_COOKIE_SAMESITE not in valid_samesite:
+        raise ImproperlyConfigured(
+            'CSRF_COOKIE_SAMESITE inválido. Usa Lax, Strict o None.'
+        )
     
     # HSTS (HTTP Strict Transport Security)
-    SECURE_HSTS_SECONDS = 31536000  # 1 año
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+    SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=31536000, cast=int)
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = config('SECURE_HSTS_INCLUDE_SUBDOMAINS', default=True, cast=bool)
+    SECURE_HSTS_PRELOAD = config('SECURE_HSTS_PRELOAD', default=True, cast=bool)
     
     # Otras configuraciones de seguridad
-    SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
+    SECURE_REFERRER_POLICY = 'same-origin'
+    SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
