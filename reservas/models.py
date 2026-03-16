@@ -671,13 +671,25 @@ class MenuDelDia(models.Model):
     )
     activo = models.BooleanField(
         default=True,
-        help_text="Si hay varios menús activos, se muestra el más reciente"
+        help_text="Publicar u ocultar el menú del día"
     )
     consumicion_incluida = models.CharField(
         max_length=120,
         default="Incluye una consumición: vino, cerveza, refresco o agua"
     )
     notas = models.TextField(blank=True)
+
+    def save(self, *args, **kwargs):
+        """Mantiene un único menú del día y lo fecha automáticamente en hoy."""
+        existente = MenuDelDia.objects.first()
+        if existente and self.pk != existente.pk:
+            self.pk = existente.pk
+
+        self.fecha = date.today()
+        super().save(*args, **kwargs)
+
+        # Garantiza singleton real en BD, eliminando menús duplicados antiguos.
+        MenuDelDia.objects.exclude(pk=self.pk).delete()
 
     def __str__(self):
         return f"Menú del día {self.fecha}"

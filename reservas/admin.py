@@ -217,12 +217,21 @@ class MenuDelDiaAdmin(admin.ModelAdmin):
     ordering = ['-fecha']
     inlines = [PlatoMenuDelDiaInline]
 
+    def has_add_permission(self, request):
+        return not MenuDelDia.objects.exists()
+
 
 class PlatoMenuEspecialInline(admin.TabularInline):
     model = PlatoMenuEspecial
     extra = 1
     fields = ['categoria', 'nombre', 'descripcion', 'orden', 'disponible']
     ordering = ['categoria', 'orden']
+
+
+# 🎨 PERSONALIZACIÓN DEL PANEL DE ADMINISTRACIÓN
+admin.site.site_header = "Panel de Administración Hotel Rivera"
+admin.site.site_title = "Admin Hotel Rivera"
+admin.site.index_title = "Gestión del Hotel"
 
 
 @admin.register(MenuEspecial)

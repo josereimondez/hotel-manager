@@ -447,12 +447,13 @@ def menu_del_dia(request):
     """Muestra el menú del día y los menús especiales activos hoy."""
     hoy = date.today()
 
-    menu = (
-        MenuDelDia.objects
-        .filter(activo=True, fecha=hoy)
-        .prefetch_related('platos')
-        .first()
-    )
+    menu = MenuDelDia.objects.prefetch_related('platos').first()
+    if menu and menu.fecha != hoy:
+        menu.fecha = hoy
+        menu.save(update_fields=['fecha'])
+
+    if menu and not menu.activo:
+        menu = None
 
     primeros, segundos, postres = [], [], []
     if menu:
@@ -483,10 +484,13 @@ def editar_menu_del_dia(request):
         messages.error(request, 'No tienes permisos para editar el menú del día.')
         return redirect('menu_del_dia')
 
-    menu, _ = MenuDelDia.objects.get_or_create(
-        fecha=date.today(),
-        defaults={'activo': True},
-    )
+    menu = MenuDelDia.objects.first()
+    if not menu:
+        menu = MenuDelDia.objects.create(activo=True)
+
+    if menu.fecha != date.today():
+        menu.fecha = date.today()
+        menu.save(update_fields=['fecha'])
 
     if request.method == 'POST':
         form = MenuDelDiaForm(request.POST, instance=menu)
