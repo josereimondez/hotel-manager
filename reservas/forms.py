@@ -4,9 +4,10 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.utils.html import strip_tags
 
-User = get_user_model()
 from .models import (Cliente, Reserva, MenuDelDia, PlatoMenuDelDia,
                      MenuEspecial, PlatoMenuEspecial, ViajeroCheckin)
+
+User = get_user_model()
 
 # 🎓 CONCEPTO: ModelForm = Formulario basado en un modelo
 
@@ -527,19 +528,14 @@ class ReservaForm(forms.ModelForm):
             raise forms.ValidationError('Debes seleccionar un medio de pago.')
 
         # 🔒 Validar disponibilidad: no solapar con reservas existentes
-        if self.habitacion and fecha_entrada and fecha_salida:
-            solapadas = Reserva.objects.filter(
-                habitacion=self.habitacion,
-                estado__in=['confirmada', 'en_curso', 'pendiente'],
-                fecha_entrada__lt=fecha_salida,
-                fecha_salida__gt=fecha_entrada,
+        reserva_solapada = Reserva.buscar_reserva_solapada(
+            self.habitacion, fecha_entrada, fecha_salida
+        )
+        if reserva_solapada:
+            raise forms.ValidationError(
+                f'La habitación ya está reservada del {reserva_solapada.fecha_entrada} al '
+                f'{reserva_solapada.fecha_salida}. Por favor elige otras fechas.'
             )
-            if solapadas.exists():
-                r = solapadas.first()
-                raise forms.ValidationError(
-                    f'La habitación ya está reservada del {r.fecha_entrada} al {r.fecha_salida}. '
-                    f'Por favor elige otras fechas.'
-                )
 
         return cleaned_data
 

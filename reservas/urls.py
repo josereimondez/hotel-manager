@@ -6,9 +6,10 @@ from . import views
 urlpatterns = [
     # Página principal
     path('', views.home, name='home'),
-    
+
     # 🔍 SEO: Sitemap y Robots
     path('sitemap.xml', views.sitemap_xml, name='sitemap_xml'),
+    path('robots.txt', views.robots_txt, name='robots_txt'),
     
     # Habitaciones
     path('habitaciones/', views.listado_habitaciones, name='listado_habitaciones'),

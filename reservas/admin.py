@@ -30,7 +30,7 @@ class HabitacionAdmin(admin.ModelAdmin):
     
     # Ordenamiento por defecto
     ordering = ['numero']
-    
+
     # Organización de campos en el formulario
     fieldsets = (
         ('Información Básica', {
@@ -51,10 +51,7 @@ class HabitacionAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
-    
-    # Ordenamiento por defecto
-    ordering = ['numero']
-    
+
     # 🎨 MÉTODOS PERSONALIZADOS PARA MOSTRAR IMÁGENES
     
     def miniatura(self, obj):

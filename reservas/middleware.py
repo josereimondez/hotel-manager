@@ -30,6 +30,10 @@ class RatelimitMiddleware:
                 message = 'Has excedido el límite de reservas permitidas. Por favor, espera un momento e intenta de nuevo.'
             elif 'fechas-ocupadas' in request.path:
                 message = 'Demasiadas consultas. Por favor, recarga la página en unos segundos.'
+            elif 'perfil' in request.path:
+                message = 'Has excedido el límite de cambios de perfil. Por favor, espera un momento e intenta de nuevo.'
+            elif 'menu-del-dia' in request.path or 'menu-especial' in request.path:
+                message = 'Has excedido el límite de ediciones de menú. Por favor, espera un momento e intenta de nuevo.'
             else:
                 message = 'Has excedido el límite de solicitudes permitidas. Por favor, espera un momento e intenta de nuevo.'
             

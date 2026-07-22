@@ -5,7 +5,7 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, EmailValidator
-from django.db import models
+from django.db import models, transaction
 from django.utils.html import strip_tags
 
 # 🎓 CONCEPTO: Una clase = una tabla en la base de datos
@@ -292,7 +292,7 @@ class Habitacion(models.Model):
         verbose_name = "Habitación"
         verbose_name_plural = "Habitaciones"
         ordering = ['numero']           # Ordenar por número
-        
+
         # Índices para búsquedas rápidas
         indexes = [
             models.Index(fields=['tipo']),
@@ -470,24 +470,44 @@ class Reserva(models.Model):
         return f"RES-{self.id:06d}"  # 🐍 RES-000042
     
     # ✅ VALIDACIONES
-    
+
+    @staticmethod
+    def buscar_reserva_solapada(habitacion, fecha_entrada, fecha_salida, excluir_id=None):
+        """
+        Busca una reserva activa que se solape con el rango de fechas dado.
+
+        🐍 PYTHON: Consulta eficiente con el ORM de Django.
+        """
+        if not habitacion or not fecha_entrada or not fecha_salida:
+            return None
+
+        queryset = Reserva.objects.filter(
+            habitacion=habitacion,
+            estado__in=['confirmada', 'en_curso', 'pendiente'],
+            fecha_entrada__lt=fecha_salida,
+            fecha_salida__gt=fecha_entrada,
+        )
+        if excluir_id:
+            queryset = queryset.exclude(id=excluir_id)
+        return queryset.first()
+
     def clean(self):
         """
         Validaciones personalizadas antes de guardar.
-        
+
         🐍 PYTHON: Método especial de Django para validar
         """
         # 1. Validar que salida sea posterior a entrada (solo si ambas fechas existen)
         if self.fecha_entrada and self.fecha_salida:
             if self.fecha_salida <= self.fecha_entrada:
                 raise ValidationError('La fecha de salida debe ser posterior a la entrada')
-        
+
         # 2. No permitir reservas en el pasado
         if self.fecha_entrada and self.fecha_entrada < date.today():
             raise ValidationError('No se pueden hacer reservas en fechas pasadas')
-        
+
         # 3. Validar capacidad de la habitación
-        if hasattr(self, 'habitacion') and self.habitacion:
+        if self.habitacion_id:
             if self.total_personas > self.habitacion.capacidad:
                 raise ValidationError(
                     f'La habitación solo tiene capacidad para {self.habitacion.capacidad} personas'
@@ -499,21 +519,17 @@ class Reserva(models.Model):
             if not re.match(r'^[A-Z]{2}[0-9A-Z]{13,32}$', iban_limpio):
                 raise ValidationError({'iban': 'IBAN inválido.'})
             self.iban = iban_limpio
-        
+
         # 4. Validar disponibilidad (no solapar reservas)
-        if hasattr(self, 'habitacion') and self.habitacion and self.fecha_entrada and self.fecha_salida:
-            reservas_solapadas = Reserva.objects.filter(
-                habitacion=self.habitacion,
-                estado__in=['confirmada', 'en_curso', 'pendiente']
-            ).exclude(id=self.id)  # 🐍 Excluir esta misma reserva si es edición
-            
-            for reserva in reservas_solapadas:
-                # Verificar solapamiento de fechas
-                if (self.fecha_entrada < reserva.fecha_salida and 
-                    self.fecha_salida > reserva.fecha_entrada):
-                    raise ValidationError(
-                        f'La habitación ya está reservada del {reserva.fecha_entrada} al {reserva.fecha_salida}'
-                    )
+        if self.habitacion_id and self.fecha_entrada and self.fecha_salida:
+            reserva_solapada = self.buscar_reserva_solapada(
+                self.habitacion, self.fecha_entrada, self.fecha_salida, excluir_id=self.id
+            )
+            if reserva_solapada:
+                raise ValidationError(
+                    f'La habitación ya está reservada del {reserva_solapada.fecha_entrada} '
+                    f'al {reserva_solapada.fecha_salida}'
+                )
     
     def save(self, *args, **kwargs):
         """
@@ -547,7 +563,12 @@ class Reserva(models.Model):
         verbose_name = "Reserva"
         verbose_name_plural = "Reservas"
         ordering = ['-fecha_reserva']  # 🐍 - = descendente
-        
+
+        # Índice para acelerar la comprobación de solapamiento de reservas
+        indexes = [
+            models.Index(fields=['habitacion', 'fecha_salida', 'fecha_entrada']),
+        ]
+
         # Restricción a nivel de BD (comentado por compatibilidad)
         # constraints = [
         #     models.CheckConstraint(
@@ -681,15 +702,20 @@ class MenuDelDia(models.Model):
 
     def save(self, *args, **kwargs):
         """Mantiene un único menú del día y lo fecha automáticamente en hoy."""
-        existente = MenuDelDia.objects.first()
-        if existente and self.pk != existente.pk:
-            self.pk = existente.pk
+        # 🎓 CONCEPTO: transaction.atomic evita condiciones de carrera en BD
+        with transaction.atomic():
+            existente = MenuDelDia.objects.first()
+            if existente and self.pk != existente.pk:
+                # Reutilizar el registro existente para mantener el singleton
+                self.pk = existente.pk
+                # Si viene de objects.create() trae force_insert=True; lo quitamos
+                kwargs.pop('force_insert', None)
 
-        self.fecha = date.today()
-        super().save(*args, **kwargs)
+            self.fecha = date.today()
+            super().save(*args, **kwargs)
 
-        # Garantiza singleton real en BD, eliminando menús duplicados antiguos.
-        MenuDelDia.objects.exclude(pk=self.pk).delete()
+            # Garantiza singleton real en BD, eliminando menús duplicados antiguos.
+            MenuDelDia.objects.exclude(pk=self.pk).delete()
 
     def __str__(self):
         return f"Menú del día {self.fecha}"

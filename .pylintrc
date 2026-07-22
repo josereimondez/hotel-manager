@@ -25,6 +25,10 @@ disable=
     W0718,  # broad-exception-caught (capturas intencionadas en vistas)
     W0613,  # unused-argument (request no siempre se usa explícitamente en vistas)
 
+[BASIC]
+# setUp es el método estándar de unittest; no forzar snake_case
+good-names=setUp
+
 [DESIGN]
 # ViajeroCheckin tiene más de 7 atributos por requisito legal
 max-attributes=20

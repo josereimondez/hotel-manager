@@ -170,7 +170,16 @@ STATICFILES_DIRS = [
 
 # Para producción - Carpeta donde collectstatic recopila todos los archivos estáticos
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# 🎓 CONCEPTO: STORAGES reemplaza STATICFILES_STORAGE en Django 5.0+
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 # 📂 Media files (archivos subidos por usuarios)
 # 🎓 CONCEPTO: MEDIA = fotos, PDFs, etc. subidos por usuarios

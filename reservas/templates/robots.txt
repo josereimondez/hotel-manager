@@ -4,9 +4,8 @@
 User-agent: *
 Allow: /
 Allow: /habitaciones/
-Allow: /inicio/
-Allow: /restaurante/
-Allow: /contacto/
+Allow: /menu-del-dia/
+Allow: /via-kunig/
 Disallow: /admin/
 Disallow: /login/
 Disallow: /logout/
@@ -14,6 +13,8 @@ Disallow: /registro/
 Disallow: /media/
 Disallow: /reservar/
 Disallow: /mis-reservas/
+Disallow: /perfil/
+Disallow: /reserva/
 
 # Google específicamente
 User-agent: Googlebot
@@ -24,4 +25,4 @@ User-agent: Bingbot
 Allow: /
 
 # Sitemap
-Sitemap: https://hostal-rivera-becerre.senderosdesconocidos.top/sitemap.xml
+Sitemap: {{ sitemap_url }}

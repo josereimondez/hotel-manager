@@ -5,8 +5,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
+from django.urls import reverse
 from django.utils.html import strip_tags
+from django.utils.http import url_has_allowed_host_and_scheme
 from django_ratelimit.decorators import ratelimit
 from .models import Habitacion, Cliente, Reserva, MenuDelDia, MenuEspecial
 from .forms import (ClienteRegistroForm, ReservaForm, RegistroUsuarioForm, EditarUsuarioForm,
@@ -240,12 +242,18 @@ def fechas_ocupadas(request, habitacion_id):
     return JsonResponse({'ocupadas': rangos})
 
 
+@login_required  # 🔐 Solo el titular de la reserva puede ver sus detalles
 def detalle_reserva(request, id):  # pylint: disable=redefined-builtin
     """
     Vista de detalle de reserva.
     """
-    reserva = get_object_or_404(Reserva, id=id)
-    
+    reserva = get_object_or_404(
+        Reserva.objects.select_related('habitacion', 'cliente'),
+        id=id
+    )
+    if reserva.cliente.usuario != request.user and not request.user.is_staff:
+        return HttpResponseForbidden('No tienes permiso para ver esta reserva.')
+
     context = {'reserva': reserva}
     return render(request, 'reservas/detalle_reserva.html', context)
 
@@ -253,7 +261,10 @@ def detalle_reserva(request, id):  # pylint: disable=redefined-builtin
 @login_required
 def checkin_online_reserva(request, id):  # pylint: disable=redefined-builtin
     """Check-in online legal de viajeros para una reserva existente."""
-    reserva = get_object_or_404(Reserva, id=id, cliente__usuario=request.user)
+    reserva = get_object_or_404(
+        Reserva.objects.select_related('habitacion', 'cliente'),
+        id=id, cliente__usuario=request.user
+    )
     min_viajeros_requeridos = max(1, reserva.numero_adultos)
     viajeros_existentes = reserva.viajeros_checkin.count()
     formset_cls = get_viajero_checkin_formset(extra=max(0, min_viajeros_requeridos - viajeros_existentes))
@@ -294,6 +305,7 @@ def checkin_online_reserva(request, id):  # pylint: disable=redefined-builtin
 
 
 @login_required  # 🔐 Requiere estar logueado
+@ratelimit(key='user', rate='120/h', method='GET', block=True)
 def mis_reservas(request):
     """
     Vista para que el cliente vea sus reservas.
@@ -306,7 +318,11 @@ def mis_reservas(request):
     try:
         cliente = request.user.cliente
         # Solo mostrar las reservas del cliente actual
-        reservas = Reserva.objects.filter(cliente=cliente).order_by('-fecha_reserva')
+        reservas = (
+            Reserva.objects.filter(cliente=cliente)
+            .select_related('habitacion')
+            .order_by('-fecha_reserva')
+        )
     except Cliente.DoesNotExist:
         messages.warning(request, 'Debes completar tu perfil de cliente.')
         return redirect('registro_cliente')
@@ -341,8 +357,14 @@ def login_view(request):
             login(request, user)  # 🔒 Iniciar sesión
             messages.success(request, f'¡Bienvenido de nuevo, {user.username}!')
             # Redirigir a la página que intentaba acceder o al home
-            next_url = request.GET.get('next', 'home')
-            return redirect(next_url)
+            next_url = request.GET.get('next')
+            if next_url and url_has_allowed_host_and_scheme(
+                next_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure()
+            ):
+                return redirect(next_url)
+            return redirect('home')
 
         messages.error(request, 'Usuario o contraseña incorrectos')
     
@@ -360,54 +382,73 @@ def logout_view(request):
     return redirect('home')
 
 
+def robots_txt(request):
+    """
+    Vista para servir robots.txt dinámico.
+
+    🔍 SEO: Indica a los buscadores qué URLs pueden indexar.
+    """
+    return render(request, 'robots.txt', {
+        'sitemap_url': request.build_absolute_uri(reverse('sitemap_xml'))
+    }, content_type='text/plain')
+
+
 def sitemap_xml(request):
     """
     Vista para generar sitemap.xml dinámico.
-    
+
     🔍 SEO: XML Sitemap para indexación en buscadores
     """
     habitaciones = Habitacion.objects.all()
-    
-    # Construir XML manualmente
-    xml_content = '<?xml version="1.0" encoding="UTF-8"?>\n'
-    xml_content += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-    
-    # Home
-    xml_content += '  <url>\n'
-    xml_content += '    <loc>https://hostal-rivera-becerre.senderosdesconocidos.top/</loc>\n'
-    xml_content += '    <lastmod>2026-03-03</lastmod>\n'
-    xml_content += '    <changefreq>daily</changefreq>\n'
-    xml_content += '    <priority>1.0</priority>\n'
-    xml_content += '  </url>\n'
-    
-    # Listado de habitaciones
-    xml_content += '  <url>\n'
-    xml_content += '    <loc>https://hostal-rivera-becerre.senderosdesconocidos.top/habitaciones/</loc>\n'
-    xml_content += '    <lastmod>2026-03-03</lastmod>\n'
-    xml_content += '    <changefreq>weekly</changefreq>\n'
-    xml_content += '    <priority>0.9</priority>\n'
-    xml_content += '  </url>\n'
-    
-    # Cada habitación
+    hoy = date.today().isoformat()
+
+    urls = [
+        {
+            'loc': request.build_absolute_uri('/'),
+            'lastmod': hoy,
+            'changefreq': 'daily',
+            'priority': '1.0',
+        },
+        {
+            'loc': request.build_absolute_uri(reverse('listado_habitaciones')),
+            'lastmod': hoy,
+            'changefreq': 'weekly',
+            'priority': '0.9',
+        },
+        {
+            'loc': request.build_absolute_uri(reverse('menu_del_dia')),
+            'lastmod': hoy,
+            'changefreq': 'daily',
+            'priority': '0.8',
+        },
+    ]
+
     for habitacion in habitaciones:
-        xml_content += '  <url>\n'
-        xml_content += f'    <loc>https://hostal-rivera-becerre.senderosdesconocidos.top/habitaciones/{habitacion.id}/</loc>\n'
-        xml_content += f'    <lastmod>{habitacion.id}</lastmod>\n'
-        xml_content += '    <changefreq>monthly</changefreq>\n'
-        xml_content += '    <priority>0.8</priority>\n'
-        xml_content += '  </url>\n'
-    
-    # Registro y login
-    xml_content += '  <url>\n'
-    xml_content += '    <loc>https://hostal-rivera-becerre.senderosdesconocidos.top/registro/</loc>\n'
-    xml_content += '    <lastmod>2026-03-03</lastmod>\n'
-    xml_content += '    <changefreq>yearly</changefreq>\n'
-    xml_content += '    <priority>0.7</priority>\n'
-    xml_content += '  </url>\n'
-    
-    xml_content += '</urlset>'
-    
-    return render(request, 'sitemap.xml', {'xml': xml_content}, content_type='application/xml')
+        urls.append({
+            'loc': request.build_absolute_uri(
+                reverse('detalle_habitacion', args=[habitacion.id])
+            ),
+            'lastmod': habitacion.fecha_actualizacion.date().isoformat(),
+            'changefreq': 'monthly',
+            'priority': '0.7',
+        })
+
+    urls.extend([
+        {
+            'loc': request.build_absolute_uri(reverse('registro_cliente')),
+            'lastmod': hoy,
+            'changefreq': 'yearly',
+            'priority': '0.5',
+        },
+        {
+            'loc': request.build_absolute_uri(reverse('politica_privacidad')),
+            'lastmod': hoy,
+            'changefreq': 'yearly',
+            'priority': '0.3',
+        },
+    ])
+
+    return render(request, 'sitemap.xml', {'urls': urls}, content_type='application/xml')
 
 
 # 📋 PÁGINAS LEGALES (RGPD, LSSI-CE)
@@ -478,6 +519,7 @@ def menu_del_dia(request):
 
 
 @login_required
+@ratelimit(key='user', rate='30/h', method='POST', block=True)
 def editar_menu_del_dia(request):
     """Panel de edición del menú del día — solo para staff."""
     if not request.user.is_staff:
@@ -515,6 +557,7 @@ def editar_menu_del_dia(request):
 
 
 @login_required
+@ratelimit(key='user', rate='30/h', method='POST', block=True)
 def crear_editar_menu_especial(request, pk=None):
     """Crear (pk=None) o editar (pk=id) un menú especial — solo staff."""
     if not request.user.is_staff:
@@ -572,6 +615,7 @@ def mi_perfil(request):
 
 
 @login_required
+@ratelimit(key='user', rate='10/h', method='POST', block=True)
 def editar_perfil(request):
     """
     Vista para editar los datos del perfil del usuario.
