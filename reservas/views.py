@@ -17,49 +17,32 @@ from .forms import (ClienteRegistroForm, ReservaForm, RegistroUsuarioForm, Edita
                     get_viajero_checkin_formset)
 
 
-# 🎓 CONCEPTO: Vistas = funciones que procesan requests y devuelven responses
-
-
 def home(request):
-    """
-    Vista principal - Página de inicio.
-    
-    🐍 PYTHON QUE APRENDES:
-    - Funciones con parámetros
-    - Diccionarios (context)
-    - render() para templates
-    """
-    habitaciones_destacadas = Habitacion.objects.all()[:3]  # 🐍 [:3] = primeras 3
-    
+    """Vista principal - Página de inicio."""
+    habitaciones_destacadas = Habitacion.objects.all()[:3]
+
     context = {
         'habitaciones': habitaciones_destacadas,
         'titulo': 'Bienvenido a nuestro Hotel'
     }
-    
+
     return render(request, 'reservas/home.html', context)
 
 
 def listado_habitaciones(request):
-    """
-    Vista de listado de habitaciones disponibles.
-    
-    🐍 PYTHON QUE APRENDES:
-    - GET parameters (request.GET)
-    - Filtros con Django ORM
-    - Condicionales
-    """
+    """Vista de listado de habitaciones disponibles."""
     habitaciones = Habitacion.objects.all()
-    
-    # 🔍 Filtros opcionales con sanitización
+
+    # Filtros opcionales con sanitización
     tipo = strip_tags(request.GET.get('tipo', '').strip())
     precio_max = request.GET.get('precio_max', '')
-    
+
     # Validar tipo contra opciones válidas
     if tipo:
         tipos_validos = [choice[0] for choice in Habitacion.TIPO_CHOICES]
         if tipo in tipos_validos:
             habitaciones = habitaciones.filter(tipo=tipo)
-    
+
     # Validar precio_max es numérico
     if precio_max:
         try:
@@ -68,29 +51,23 @@ def listado_habitaciones(request):
                 habitaciones = habitaciones.filter(precio_base__lte=precio_max)
         except (ValueError, TypeError):
             pass  # Ignorar si no es un número válido
-    
+
     context = {
         'habitaciones': habitaciones,
-        'tipos': Habitacion.TIPO_CHOICES,  # 🐍 Para el filtro
+        'tipos': Habitacion.TIPO_CHOICES,
     }
-    
+
     return render(request, 'reservas/listado_habitaciones.html', context)
 
 
 def detalle_habitacion(request, id):
-    """
-    Vista de detalle de una habitación específica.
-    
-    🐍 PYTHON QUE APRENDES:
-    - Parámetros en URLs
-    - get_object_or_404 (manejo de errores)
-    """
+    """Vista de detalle de una habitación específica."""
     habitacion = get_object_or_404(Habitacion, id=id)
-    
+
     context = {
         'habitacion': habitacion,
     }
-    
+
     return render(request, 'reservas/detalle_habitacion.html', context)
 
 
@@ -98,34 +75,27 @@ def detalle_habitacion(request, id):
 def registro_cliente(request):
     """
     Vista para registro de nuevos clientes.
-    
-    🐍 PYTHON QUE APRENDES:
-    - POST vs GET
-    - Formularios Django
-    - Redirecciones
-    - Mensajes flash
-    - Crear usuario y cliente simultáneamente
-    Rate limit: 3 registros por hora por IP (previene spam)
+    Rate limit: 3 registros por hora por IP (previene spam).
     """
-    if request.method == 'POST':  # 🐍 Si envió el formulario
+    if request.method == 'POST':
         user_form = RegistroUsuarioForm(request.POST)
         cliente_form = ClienteRegistroForm(request.POST)
-        
+
         if user_form.is_valid() and cliente_form.is_valid():
             try:
                 # Crear usuario
                 user = user_form.save(commit=False)
                 user.set_password(user_form.cleaned_data['password'])
                 user.save()
-                
+
                 # Crear cliente y vincular con usuario
                 cliente = cliente_form.save(commit=False)
                 cliente.usuario = user
                 cliente.save()
-                
+
                 # Loguear automáticamente
                 login(request, user)
-                
+
                 messages.success(request, '¡Registro exitoso! Ya puedes hacer reservas.')
                 return redirect('home')
             except Exception as e:
@@ -135,7 +105,7 @@ def registro_cliente(request):
     else:  # GET - Mostrar formulario vacío
         user_form = RegistroUsuarioForm()
         cliente_form = ClienteRegistroForm()
-    
+
     context = {
         'user_form': user_form,
         'cliente_form': cliente_form
@@ -143,40 +113,34 @@ def registro_cliente(request):
     return render(request, 'reservas/registro_cliente.html', context)
 
 
-@login_required  # � Requiere estar logueado
+@login_required
 @ratelimit(key='user', rate='10/h', method='POST', block=True)
 def crear_reserva(request, habitacion_id):
     """
     Vista para crear una nueva reserva.
-    
-    🐍 PYTHON QUE APRENDES:
-    - Formularios con instancia
-    - Try-except
-    - Validaciones
-    - Decoradores (@login_required)
-    Rate limit: 10 reservas por hora por usuario
+    Rate limit: 10 reservas por hora por usuario.
     """
     habitacion = get_object_or_404(Habitacion, id=habitacion_id)
-    
+
     # Obtener el cliente del usuario actual
     try:
         cliente = request.user.cliente
     except Cliente.DoesNotExist:
         messages.error(request, 'Debes completar tu perfil de cliente primero.')
         return redirect('registro_cliente')
-    
+
     if request.method == 'POST':
         form = ReservaForm(request.POST, habitacion=habitacion)
-        
+
         if form.is_valid():
             try:
-                reserva = form.save(commit=False)  # 🐍 No guardar todavía
+                reserva = form.save(commit=False)
                 reserva.habitacion = habitacion
-                reserva.cliente = cliente  # 🐍 Asignar cliente automáticamente
-                reserva.save()  # 🐍 Ahora sí guardar
-                
+                reserva.cliente = cliente
+                reserva.save()
+
                 messages.success(
-                    request, 
+                    request,
                     f'¡Reserva creada! Código: {reserva.codigo_reserva}'
                 )
                 messages.info(
@@ -184,7 +148,7 @@ def crear_reserva(request, habitacion_id):
                     'Completa ahora el check-in online para cumplir con el registro obligatorio de viajeros.'
                 )
                 return redirect('checkin_online_reserva', id=reserva.id)
-                
+
             except Exception as e:
                 messages.error(request, f'Error: {str(e)}')
     else:
@@ -196,7 +160,7 @@ def crear_reserva(request, habitacion_id):
             },
             habitacion=habitacion
         )
-    
+
     # Calcular fechas ocupadas para el calendario
     reservas_ocupadas = Reserva.objects.filter(
         habitacion=habitacion,
@@ -242,11 +206,10 @@ def fechas_ocupadas(request, habitacion_id):
     return JsonResponse({'ocupadas': rangos})
 
 
-@login_required  # 🔐 Solo el titular de la reserva puede ver sus detalles
+@login_required
+# Solo el titular de la reserva o staff pueden ver sus detalles
 def detalle_reserva(request, id):  # pylint: disable=redefined-builtin
-    """
-    Vista de detalle de reserva.
-    """
+    """Vista de detalle de reserva."""
     reserva = get_object_or_404(
         Reserva.objects.select_related('habitacion', 'cliente'),
         id=id
@@ -288,7 +251,7 @@ def checkin_online_reserva(request, id):  # pylint: disable=redefined-builtin
                 reserva.checkin_online_completado = True
                 reserva.save()
                 formset.save()
-                messages.success(request, '✅ Check-in online completado correctamente.')
+                messages.success(request, 'Check-in online completado correctamente.')
                 return redirect('detalle_reserva', id=reserva.id)
         else:
             messages.error(request, 'Revisa los errores del check-in online.')
@@ -304,20 +267,12 @@ def checkin_online_reserva(request, id):  # pylint: disable=redefined-builtin
     })
 
 
-@login_required  # 🔐 Requiere estar logueado
+@login_required
 @ratelimit(key='user', rate='120/h', method='GET', block=True)
 def mis_reservas(request):
-    """
-    Vista para que el cliente vea sus reservas.
-    
-    🐍 PYTHON QUE APRENDES:
-    - Filtros complejos
-    - Ordenamiento
-    - Autenticación de usuarios
-    """
+    """Vista para que el cliente vea sus reservas."""
     try:
         cliente = request.user.cliente
-        # Solo mostrar las reservas del cliente actual
         reservas = (
             Reserva.objects.filter(cliente=cliente)
             .select_related('habitacion')
@@ -326,7 +281,7 @@ def mis_reservas(request):
     except Cliente.DoesNotExist:
         messages.warning(request, 'Debes completar tu perfil de cliente.')
         return redirect('registro_cliente')
-    
+
     context = {'reservas': reservas}
     return render(request, 'reservas/mis_reservas.html', context)
 
@@ -336,25 +291,22 @@ def mis_reservas(request):
 def login_view(request):
     """
     Vista de inicio de sesión.
-    
-    🐍 PYTHON: Autenticación de usuarios
-    Rate limit: 5 intentos por minuto (previene brute force)
+    Rate limit: 5 intentos por minuto (previene brute force).
     """
     if request.method == 'POST':
         # Sanitizar inputs
         username = strip_tags(request.POST.get('username', '').strip())
         password = request.POST.get('password', '')  # No sanitizar password
-        
+
         # Validar que no estén vacíos
         if not username or not password:
             messages.error(request, 'Por favor completa todos los campos.')
             return render(request, 'reservas/login.html')
-        
-        # 🔒 authenticate() verifica usuario/contraseña
+
         user = authenticate(request, username=username, password=password)
-        
+
         if user is not None:
-            login(request, user)  # 🔒 Iniciar sesión
+            login(request, user)
             messages.success(request, f'¡Bienvenido de nuevo, {user.username}!')
             # Redirigir a la página que intentaba acceder o al home
             next_url = request.GET.get('next')
@@ -367,16 +319,12 @@ def login_view(request):
             return redirect('home')
 
         messages.error(request, 'Usuario o contraseña incorrectos')
-    
+
     return render(request, 'reservas/login.html')
 
 
 def logout_view(request):
-    """
-    Vista de cierre de sesión.
-    
-    🐍 PYTHON: logout() cierra la sesión del usuario
-    """
+    """Vista de cierre de sesión."""
     logout(request)
     messages.info(request, 'Has cerrado sesión correctamente')
     return redirect('home')
@@ -385,8 +333,7 @@ def logout_view(request):
 def robots_txt(request):
     """
     Vista para servir robots.txt dinámico.
-
-    🔍 SEO: Indica a los buscadores qué URLs pueden indexar.
+    SEO: indica a los buscadores qué URLs pueden indexar.
     """
     return render(request, 'robots.txt', {
         'sitemap_url': request.build_absolute_uri(reverse('sitemap_xml'))
@@ -396,8 +343,7 @@ def robots_txt(request):
 def sitemap_xml(request):
     """
     Vista para generar sitemap.xml dinámico.
-
-    🔍 SEO: XML Sitemap para indexación en buscadores
+    SEO: XML Sitemap para indexación en buscadores.
     """
     habitaciones = Habitacion.objects.all()
     hoy = date.today().isoformat()
@@ -451,7 +397,7 @@ def sitemap_xml(request):
     return render(request, 'sitemap.xml', {'urls': urls}, content_type='application/xml')
 
 
-# 📋 PÁGINAS LEGALES (RGPD, LSSI-CE)
+# PÁGINAS LEGALES (RGPD, LSSI-CE)
 
 def politica_privacidad(request):
     """
@@ -478,9 +424,7 @@ def terminos_condiciones(request):
 
 
 def via_kunig(request):
-    """
-    Vista para la página de la Vía Künig.
-    """
+    """Vista para la página de la Vía Künig."""
     return render(request, 'reservas/via_kunig.html')
 
 
@@ -541,7 +485,7 @@ def editar_menu_del_dia(request):
         if form.is_valid() and formset.is_valid():
             form.save()
             formset.save()
-            messages.success(request, '✅ Menú del día actualizado correctamente.')
+            messages.success(request, 'Menú del día actualizado correctamente.')
             return redirect('menu_del_dia')
         else:
             messages.error(request, 'Revisa los errores del formulario.')
@@ -577,7 +521,7 @@ def crear_editar_menu_especial(request, pk=None):
             if formset.is_valid():
                 formset.save()
                 accion = 'creado' if es_nuevo else 'actualizado'
-                messages.success(request, f'✅ Menú especial {accion} correctamente.')
+                messages.success(request, f'Menú especial {accion} correctamente.')
                 return redirect('menu_del_dia')
             else:
                 messages.error(request, 'Revisa los errores en los platos.')
@@ -644,7 +588,7 @@ def editar_perfil(request):
                     request.user.set_password(nueva)
                     request.user.save()
                     update_session_auth_hash(request, request.user)  # Mantener sesión activa
-                    messages.success(request, '✅ Contraseña cambiada correctamente.')
+                    messages.success(request, 'Contraseña cambiada correctamente.')
                     return redirect('mi_perfil')
         else:
             user_form = EditarUsuarioForm(request.POST, instance=request.user)
@@ -659,7 +603,7 @@ def editar_perfil(request):
                 user_form.save()
                 if cliente_form:
                     cliente_form.save()
-                messages.success(request, '✅ Perfil actualizado correctamente.')
+                messages.success(request, 'Perfil actualizado correctamente.')
                 return redirect('mi_perfil')
     else:
         user_form = EditarUsuarioForm(instance=request.user)

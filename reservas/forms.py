@@ -9,15 +9,10 @@ from .models import (Cliente, Reserva, MenuDelDia, PlatoMenuDelDia,
 
 User = get_user_model()
 
-# 🎓 CONCEPTO: ModelForm = Formulario basado en un modelo
-
 
 class RegistroUsuarioForm(forms.ModelForm):
-    """
-    Formulario para crear cuenta de usuario.
-    
-    🐍 PYTHON: Formulario con campos extra
-    """
+    """Formulario para crear cuenta de usuario."""
+
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
         label='Contraseña'
@@ -26,7 +21,7 @@ class RegistroUsuarioForm(forms.ModelForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
         label='Confirmar contraseña'
     )
-    
+
     class Meta:
         model = User
         fields = ['username', 'email']
@@ -44,7 +39,7 @@ class RegistroUsuarioForm(forms.ModelForm):
             'username': 'Nombre de usuario',
             'email': 'Email',
         }
-    
+
     def clean_username(self):
         """Validar username: solo letras, números, guiones y guiones bajos."""
         username = self.cleaned_data.get('username', '')
@@ -61,39 +56,31 @@ class RegistroUsuarioForm(forms.ModelForm):
         if len(username) > 30:
             raise forms.ValidationError('El nombre de usuario no puede tener más de 30 caracteres.')
         return username
-    
+
     def clean_email(self):
         """Validar y normalizar email."""
         email = self.cleaned_data.get('email', '')
         email = strip_tags(email).lower().strip()
         return email
-    
+
     def clean(self):
         cleaned_data = super().clean()
         password = cleaned_data.get('password')
         password_confirm = cleaned_data.get('password_confirm')
-        
+
         if password and password_confirm and password != password_confirm:
             raise forms.ValidationError('Las contraseñas no coinciden')
-        
+
         # Validar fortaleza de contraseña
         if password and len(password) < 8:
             raise forms.ValidationError('La contraseña debe tener al menos 8 caracteres.')
-        
+
         return cleaned_data
 
 
 class ClienteRegistroForm(forms.ModelForm):
-    """
-    Formulario para registro de clientes.
-    
-    🐍 PYTHON QUE APRENDES:
-    - Clases anidadas (Meta)
-    - Herencia de ModelForm
-    - Widgets personalizados
-    - Sanitización de inputs
-    """
-    
+    """Formulario para registro de clientes."""
+
     def clean_nombre(self):
         """Sanitizar nombre."""
         nombre = self.cleaned_data.get('nombre', '')
@@ -101,7 +88,7 @@ class ClienteRegistroForm(forms.ModelForm):
         if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', nombre):
             raise forms.ValidationError('El nombre solo puede contener letras.')
         return nombre.title()
-    
+
     def clean_apellidos(self):
         """Sanitizar apellidos."""
         apellidos = self.cleaned_data.get('apellidos', '')
@@ -109,7 +96,7 @@ class ClienteRegistroForm(forms.ModelForm):
         if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', apellidos):
             raise forms.ValidationError('Los apellidos solo pueden contener letras.')
         return apellidos.title()
-    
+
     def clean_telefono(self):
         """Sanitizar y validar teléfono."""
         telefono = self.cleaned_data.get('telefono', '')
@@ -119,18 +106,18 @@ class ClienteRegistroForm(forms.ModelForm):
         if len(telefono) < 9:
             raise forms.ValidationError('El teléfono debe tener al menos 9 dígitos.')
         return telefono
-    
+
     def clean_email(self):
         """Sanitizar email."""
         email = self.cleaned_data.get('email', '')
         email = strip_tags(email).lower().strip()
         return email
-    
+
     def clean_direccion(self):
         """Sanitizar dirección."""
         direccion = self.cleaned_data.get('direccion', '')
         return strip_tags(direccion).strip()
-    
+
     def clean_ciudad(self):
         """Sanitizar ciudad."""
         ciudad = self.cleaned_data.get('ciudad', '')
@@ -138,22 +125,21 @@ class ClienteRegistroForm(forms.ModelForm):
         if ciudad and not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s-]+$', ciudad):
             raise forms.ValidationError('La ciudad solo puede contener letras.')
         return ciudad.title()
-    
+
     def clean_pais(self):
         """Sanitizar país."""
         pais = self.cleaned_data.get('pais', '')
         pais = strip_tags(pais).strip()
         return pais.title()
-    
+
     class Meta:
         model = Cliente
         fields = [
-            'nombre', 'apellidos', 'dni_nie', 
+            'nombre', 'apellidos', 'dni_nie',
             'email', 'telefono', 'fecha_nacimiento',
             'direccion', 'ciudad', 'codigo_postal', 'pais'
         ]
-        
-        # 🎨 Widgets = controles HTML personalizados
+
         widgets = {
             'nombre': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -407,24 +393,20 @@ class CambiarPasswordForm(forms.Form):
 
 
 class ReservaForm(forms.ModelForm):
-    """
-    Formulario para crear reservas.
-    
-    🐍 PYTHON: Validaciones personalizadas en formularios
-    """
-    
+    """Formulario para crear reservas."""
+
     def __init__(self, *args, habitacion=None, **kwargs):
-        """🐍 PYTHON: Constructor personalizado para recibir la habitación"""
+        """Constructor personalizado para recibir la habitación."""
         super().__init__(*args, **kwargs)
         self.habitacion = habitacion
-    
+
     class Meta:
         model = Reserva
         fields = [
-            'fecha_entrada', 'fecha_salida',  # 👈 Quitamos 'cliente'
+            'fecha_entrada', 'fecha_salida',
             'numero_adultos', 'numero_ninos', 'medio_pago', 'iban', 'observaciones'
         ]
-        
+
         widgets = {
             'cliente': forms.Select(attrs={'class': 'form-control'}),
             'fecha_entrada': forms.DateInput(attrs={
@@ -456,7 +438,7 @@ class ReservaForm(forms.ModelForm):
                 'placeholder': 'Peticiones especiales, hora estimada de llegada...'
             }),
         }
-    
+
     def clean_observaciones(self):
         """Sanitizar observaciones."""
         observaciones = self.cleaned_data.get('observaciones', '')
@@ -476,7 +458,7 @@ class ReservaForm(forms.ModelForm):
         if not re.match(r'^[A-Z]{2}[0-9A-Z]{13,32}$', iban):
             raise forms.ValidationError('IBAN inválido.')
         return iban
-    
+
     def clean_numero_adultos(self):
         """Validar número de adultos."""
         numero = self.cleaned_data.get('numero_adultos', 0)
@@ -485,7 +467,7 @@ class ReservaForm(forms.ModelForm):
         if numero > 10:
             raise forms.ValidationError('Número máximo de adultos: 10.')
         return numero
-    
+
     def clean_numero_ninos(self):
         """Validar número de niños."""
         numero = self.cleaned_data.get('numero_ninos', 0)
@@ -494,28 +476,24 @@ class ReservaForm(forms.ModelForm):
         if numero > 10:
             raise forms.ValidationError('Número máximo de niños: 10.')
         return numero
-    
+
     def clean(self):
-        """
-        Validaciones personalizadas del formulario.
-        
-        🐍 PYTHON: Método clean() para validar múltiples campos
-        """
+        """Validaciones personalizadas del formulario."""
         cleaned_data = super().clean()
         fecha_entrada = cleaned_data.get('fecha_entrada')
         fecha_salida = cleaned_data.get('fecha_salida')
         numero_adultos = cleaned_data.get('numero_adultos', 0)
         numero_ninos = cleaned_data.get('numero_ninos', 0)
         medio_pago = cleaned_data.get('medio_pago', '')
-        
+
         # Validar fechas
         if fecha_entrada and fecha_salida:
             if fecha_salida <= fecha_entrada:
                 raise forms.ValidationError(
                     'La fecha de salida debe ser posterior a la de entrada'
                 )
-        
-        # 🔍 Validar capacidad de la habitación
+
+        # Validar capacidad de la habitación
         if self.habitacion:
             total_personas = numero_adultos + numero_ninos
             if total_personas > self.habitacion.capacidad:
@@ -527,7 +505,7 @@ class ReservaForm(forms.ModelForm):
         if not medio_pago:
             raise forms.ValidationError('Debes seleccionar un medio de pago.')
 
-        # 🔒 Validar disponibilidad: no solapar con reservas existentes
+        # Validar disponibilidad: no solapar con reservas existentes
         reserva_solapada = Reserva.buscar_reserva_solapada(
             self.habitacion, fecha_entrada, fecha_salida
         )

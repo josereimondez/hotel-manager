@@ -1,12 +1,4 @@
-"""
-Tests de la aplicación de reservas.
-
-🎓 CONCEPTO: Los tests verifican que el código funciona correctamente.
-🐍 PYTHON QUE APRENDES:
-- TestCase de Django
-- Cliente de pruebas para simular peticiones HTTP
-- Fixtures setUp
-- Asserts
+"""Tests de la aplicación de reservas.
 
 Para ejecutar: python manage.py test reservas
 """

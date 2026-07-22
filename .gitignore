@@ -27,13 +27,14 @@ wheels/
 *.log
 local_settings.py
 db.sqlite3
-db.sqlite3-journal
+*.sqlite3-journal
 /media
 /staticfiles
 /static/admin  # Django admin statics
 
 # Entorno
 .env
+.env.*
 .venv
 
 # IDEs
@@ -51,3 +52,4 @@ Thumbs.db
 secrets.json
 *.pem
 *.key
+*.cert
