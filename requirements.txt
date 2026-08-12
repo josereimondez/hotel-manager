@@ -20,8 +20,8 @@ openpyxl==3.1.5
 Pillow==11.1.0
 
 # Utilidades de desarrollo
-django-extensions==3.2.4
-django-debug-toolbar==5.0.1
+django-extensions==4.1
+django-debug-toolbar==5.2.0
 
 # Fechas y timezone
 pytz==2025.2
