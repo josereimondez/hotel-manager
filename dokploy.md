@@ -276,7 +276,7 @@ curl -sSL https://dokploy.com/install.sh | sh
 
 ### 5.1 Comprar dominio
 
-Compra tu dominio (ej: `hostalrivera.com`) en cualquier registrador.
+Compra tu dominio (ej: `riverabecerrea.com`) en cualquier registrador.
 
 ### 5.2 Configurar Cloudflare
 
@@ -366,7 +366,7 @@ ADMIN_PATH=<tu-ruta-admin-secreta>
 ### 6.4 Configurar dominio y SSL
 
 En la aplicacion Django dentro de Dokploy:
-1. **Domains** → Anade `hostalrivera.com` y `www.hostalrivera.com`
+1. **Domains** → Anade `riverabecerrea.com` y `www.riverabecerrea.com`
 2. **SSL** → Activa Let's Encrypt (automatico con Dokploy)
 3. Verifica que el certificado se genera correctamente
 
