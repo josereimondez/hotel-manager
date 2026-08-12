@@ -1,30 +1,30 @@
 # Core
-Django==5.0.2
+Django==5.2.4
 python-decouple==3.8
-gunicorn==22.0.0
-whitenoise==6.7.0
+gunicorn==23.0.0
+whitenoise==6.8.2
 
 # Seguridad
 django-ratelimit==4.1.0  # Rate limiting para APIs
 
 # Base de datos
-psycopg2-binary==2.9.9  # PostgreSQL (opcional)
+psycopg2-binary==2.9.10  # PostgreSQL (opcional)
 
 # Formularios y UI
-django-crispy-forms==2.1
-crispy-bootstrap5==2024.2
+django-crispy-forms==2.3
+crispy-bootstrap5==2024.10
 
 # Reportes
-reportlab==4.1.0
-openpyxl==3.1.2
-Pillow==10.2.0
+reportlab==4.3.1
+openpyxl==3.1.5
+Pillow==11.1.0
 
 # Utilidades de desarrollo
-django-extensions==3.2.3
-django-debug-toolbar==4.3.0
+django-extensions==4.1
+django-debug-toolbar==5.2.0
 
 # Fechas y timezone
-pytz==2024.1
+pytz==2025.2
 
 # Validaciones
-python-stdnum==1.20  # Para validar DNI/NIE español
+python-stdnum==2.1  # Para validar DNI/NIE español
