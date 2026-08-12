@@ -53,3 +53,10 @@ secrets.json
 *.pem
 *.key
 *.cert
+
+# Backups locales
+/backups/
+
+#IA
+.opencode
+.specify

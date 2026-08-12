@@ -62,6 +62,98 @@ python manage.py runserver
 
 Visita: http://127.0.0.1:8000
 
+## 🐳 Despliegue Local con Docker (testing)
+
+Stack local para desarrollo y pruebas usando Docker Compose. Para produccion en Proxmox con Dokploy, ver `dokploy.md`.
+
+### 1. Requisitos
+
+- Docker y Docker Compose instalados
+- Git clonado
+
+### 2. Configuracion
+
+```bash
+# Copiar plantilla de entorno
+cp .env.example .env
+
+# Editar .env con valores seguros (especialmente SECRET_KEY y DB_PASSWORD)
+nano .env
+```
+
+### 3. Iniciar stack
+
+```bash
+docker compose -f docker-compose.local.yml up -d --build
+```
+
+Esto levanta:
+- **db**: PostgreSQL 16 (red interna, sin puerto expuesto)
+- **app**: Django + Gunicorn en `http://localhost:8000`
+- **backup**: Backup diario de PostgreSQL con retencion de 14 dias
+
+### 4. Primer despliegue
+
+```bash
+# Ejecutar migraciones
+docker compose -f docker-compose.local.yml exec app python manage.py migrate
+
+# Compilar traducciones (si no se hizo en el build)
+docker compose -f docker-compose.local.yml exec app python compile_mo.py
+
+# Crear superusuario
+docker compose -f docker-compose.local.yml exec app python manage.py createsuperuser
+
+# Verificar configuracion de seguridad
+docker compose -f docker-compose.local.yml exec app python manage.py check --deploy
+```
+
+### 5. Gestion de backups
+
+Los backups se guardan en `./backups/` automaticamente cada 24h.
+
+Backup manual:
+```bash
+docker compose -f docker-compose.local.yml exec backup pg_dump -h db -U hotel_user -d hotel_db -F c -f /backups/manual_$(date +%Y%m%d).dump
+```
+
+Restaurar backup:
+```bash
+docker compose -f docker-compose.local.yml exec -T db pg_restore -U hotel_user -d hotel_db -c < ./backups/nombre_backup.dump
+```
+
+### 6. Logs
+
+```bash
+# Logs de la app
+docker compose -f docker-compose.local.yml logs -f app
+
+# Logs de la base de datos
+docker compose -f docker-compose.local.yml logs -f db
+```
+
+### 7. Detener stack
+
+```bash
+docker compose -f docker-compose.local.yml down
+```
+
+Para eliminar volumenes (pierdes datos):
+```bash
+docker compose -f docker-compose.local.yml down -v
+```
+
+### 8. Actualizar aplicacion
+
+```bash
+git pull
+docker compose -f docker-compose.local.yml up -d --build
+docker compose -f docker-compose.local.yml exec app python manage.py migrate
+docker compose -f docker-compose.local.yml exec app python manage.py collectstatic --noinput
+```
+
+---
+
 ## 🌐 Despliegue en Producción
 
 ### Opción 1: VPS (Linux con Nginx + Gunicorn)
