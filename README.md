@@ -14,7 +14,7 @@ Sistema completo de gestión hotelera con reservas online, backoffice administra
 
 ## 🛠️ Stack Tecnológico
 
-- **Backend**: Python 3.11+ con Django 5.0
+- **Backend**: Python 3.11–3.13 con Django 5.2 LTS
 - **Base de Datos**: SQLite (desarrollo) / PostgreSQL (producción)
 - **Frontend**: Django Templates + Bootstrap 5
 - **Librerías**: 
