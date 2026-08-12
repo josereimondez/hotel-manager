@@ -28,3 +28,4 @@ pytz==2025.2
 
 # Validaciones
 python-stdnum==2.1  # Para validar DNI/NIE español
+polib==1.2.0  # Para compilar traducciones (.mo)
