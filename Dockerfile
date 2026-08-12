@@ -14,7 +14,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN python compile_mo.py && python manage.py collectstatic --noinput
+RUN SECRET_KEY=docker-build-key-no-produccion \
+    DEBUG=True \
+    ALLOWED_HOSTS=localhost \
+    python compile_mo.py && python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
