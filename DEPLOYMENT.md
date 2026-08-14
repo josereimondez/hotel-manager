@@ -1,8 +1,8 @@
-# 🚀 Guía de Despliegue - Hostal Rivera
+# Guía de Despliegue - Hostal Rivera
 
 Esta guía te ayudará a configurar y desplegar el proyecto en diferentes entornos.
 
-## 📋 Checklist Pre-Despliegue
+## Checklist Pre-Despliegue
 
 Antes de subir a GitHub o desplegar en producción:
 
@@ -15,12 +15,12 @@ Antes de subir a GitHub o desplegar en producción:
 - [x] Archivos estáticos recopilados
 - [x] Traducciones compiladas
 
-## 🖥️ Despliegue Local (Desarrollo)
+## Despliegue Local (Desarrollo)
 
 ### 1. Configuración inicial
 ```powershell
 # Clonar repositorio
-git clone https://github.com/TU_USUARIO/WEB-HOTEL.git
+git clone https://github.com/reiloop/WEB-HOTEL.git
 cd WEB-HOTEL
 
 # Crear entorno virtual
@@ -62,7 +62,7 @@ python manage.py runserver
 
 Visita: http://127.0.0.1:8000
 
-## 🐳 Despliegue Local con Docker (testing)
+## Despliegue Local con Docker (testing)
 
 Stack local para desarrollo y pruebas usando Docker Compose. Para produccion en Proxmox con Dokploy, ver `dokploy.md`.
 
@@ -154,7 +154,7 @@ docker compose -f docker-compose.local.yml exec app python manage.py collectstat
 
 ---
 
-## 🌐 Despliegue en Producción
+## Despliegue en Producción
 
 ### Opción 1: VPS (Linux con Nginx + Gunicorn)
 
@@ -185,7 +185,7 @@ GRANT ALL PRIVILEGES ON DATABASE hotel_db TO hotel_user;
 #### 3. Clonar proyecto
 ```bash
 cd /var/www
-sudo git clone https://github.com/TU_USUARIO/WEB-HOTEL.git hotel
+sudo git clone https://github.com/reiloop/WEB-HOTEL.git hotel
 cd hotel
 ```
 
@@ -250,10 +250,10 @@ Group=www-data
 WorkingDirectory=/var/www/hotel
 Environment="PATH=/var/www/hotel/venv/bin"
 ExecStart=/var/www/hotel/venv/bin/gunicorn \
-          --access-logfile - \
-          --workers 3 \
-          --bind unix:/var/www/hotel/gunicorn.sock \
-          hotel_project.wsgi:application
+ --access-logfile - \
+ --workers 3 \
+ --bind unix:/var/www/hotel/gunicorn.sock \
+ hotel_project.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
@@ -274,23 +274,23 @@ sudo nano /etc/nginx/sites-available/hotel
 Contenido:
 ```nginx
 server {
-    listen 80;
-    server_name tudominio.com www.tudominio.com;
+ listen 80;
+ server_name tudominio.com www.tudominio.com;
 
-    location = /favicon.ico { access_log off; log_not_found off; }
-    
-    location /static/ {
-        alias /var/www/hotel/staticfiles/;
-    }
-    
-    location /media/ {
-        alias /var/www/hotel/media/;
-    }
+ location = /favicon.ico { access_log off; log_not_found off; }
+ 
+ location /static/ {
+ alias /var/www/hotel/staticfiles/;
+ }
+ 
+ location /media/ {
+ alias /var/www/hotel/media/;
+ }
 
-    location / {
-        include proxy_params;
-        proxy_pass http://unix:/var/www/hotel/gunicorn.sock;
-    }
+ location / {
+ include proxy_params;
+ proxy_pass http://unix:/var/www/hotel/gunicorn.sock;
+ }
 }
 ```
 
@@ -344,13 +344,13 @@ Añadir al final de `settings.py`:
 import dj_database_url
 
 if not DEBUG:
-    # Producción en Heroku
-    DATABASES['default'] = dj_database_url.config(conn_max_age=600)
-    
-    # Whitenoise para servir archivos estáticos
-    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-    STATIC_ROOT = BASE_DIR / 'staticfiles'
+ # Producción en Heroku
+ DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+ 
+ # Whitenoise para servir archivos estáticos
+ MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+ STATIC_ROOT = BASE_DIR / 'staticfiles'
 ```
 
 #### 4. Desplegar
@@ -390,7 +390,7 @@ heroku open
 4. Configurar archivos estáticos
 5. Recargar aplicación
 
-## 🔧 Mantenimiento
+## Mantenimiento
 
 ### Actualizar código en producción
 ```bash
@@ -422,7 +422,7 @@ pg_dump -U hotel_user hotel_db > backup_$(date +%Y%m%d).sql
 cp db.sqlite3 backup_$(date +%Y%m%d).sqlite3
 ```
 
-## 🔒 Seguridad en Producción
+## Seguridad en Producción
 
 ### Checklist de seguridad
 - [ ] DEBUG=False
@@ -443,7 +443,7 @@ print(get_random_secret_key())
 
 O visita: https://djecrety.ir/
 
-## 📊 Monitoring
+## Monitoring
 
 ### Sentry (errores en producción)
 ```bash
@@ -456,14 +456,14 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
 if not DEBUG:
-    sentry_sdk.init(
-        dsn="tu-dsn-de-sentry",
-        integrations=[DjangoIntegration()],
-        traces_sample_rate=1.0,
-    )
+ sentry_sdk.init(
+ dsn="tu-dsn-de-sentry",
+ integrations=[DjangoIntegration()],
+ traces_sample_rate=1.0,
+ )
 ```
 
-## 🆘 Troubleshooting
+## Troubleshooting
 
 ### Error: "DisallowedHost"
 - Verifica ALLOWED_HOSTS en .env

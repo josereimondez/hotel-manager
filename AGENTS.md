@@ -1,12 +1,12 @@
 # AGENTS.md
 
-Django 5.0.2 hotel management app (Hostal Rivera). Single app `reservas` contains all models, views, forms, templates. Docs, code comments, and commit messages are in Spanish — keep them that way. The codebase was cleaned up to look professional on GitHub; avoid adding new teaching-style or emoji comments.
+Django 5.2.4 hotel management app (Hostal Rivera). Single app `reservas` contains all models, views, forms, templates. Docs, code comments, and commit messages are in Spanish — keep them that way. The codebase was cleaned up to look professional on GitHub; avoid adding new teaching-style or emoji comments.
 
 ## Setup gotchas (read first)
 
 - The local `.venv` has **no project dependencies installed** and runs Python 3.14. CI and Django 5.2 target **Python 3.11–3.13** — recreate the venv with a supported version before installing (`pip install -r requirements.txt`).
 - There is no `.env`, and settings **fail fast**: with `DEBUG=False` (the default) and a missing/insecure `SECRET_KEY`, every `manage.py` command raises `ImproperlyConfigured`. For local work either copy `.env.example` to `.env` and set `DEBUG=True`, or export env vars like CI does (`DEBUG=True`, `SECRET_KEY=...`, `ALLOWED_HOSTS=localhost,127.0.0.1`).
-- `requirements.txt` is the source of truth (Django==5.0.2).
+- `requirements.txt` is the source of truth (Django==5.2.4).
 
 ## Verification
 

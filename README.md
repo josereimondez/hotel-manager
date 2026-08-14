@@ -1,222 +1,105 @@
-# 🏨 Sistema de Gestión Hotelera - Hostal Rivera
+# Hostal Rivera
 
-Sistema completo de gestión hotelera con reservas online, backoffice administrativo y cumplimiento de normativa española.
+Sistema de gestion para Hostal Rivera, un alojamiento con restaurante ubicado en Becerrea (Lugo), en el corazon de la Comarca de Los Ancares, Galicia.
 
-## ✨ Características
+## Sobre el proyecto
 
-- 🏠 **Frontend público**: Listado de habitaciones, sistema de reservas, información del hotel
-- 🔐 **Sistema de autenticación**: Registro, login, perfiles de usuario
-- 📅 **Gestión de reservas**: Calendario con bloqueo de fechas ocupadas, prevención de doble reserva
-- 👤 **Perfiles de usuario**: Edición de datos personales, historial de reservas
-- 🌍 **Multiidioma**: Español, Gallego, Inglés
-- 📱 **Responsive**: Diseñado con Bootstrap 5
-- ✅ **Validaciones**: Backend y frontend para evitar errores
+Hostal Rivera es un hostal familiar situado en Becerrea, un municipio de la provincia de Lugo atravesado por la Via Kunig, un camino historico vinculado al Camino de Santiago. El establecimiento ofrece alojamiento y restaurante con cocina gallega tradicional, atendiendo a viajeros, senderistas, trabajadores en ruta y familias que recorren la zona.
 
-## 🛠️ Stack Tecnológico
+Este sistema cubre las necesidades operativas del hostal: gestion de habitaciones, reservas online con prevencion de doble reserva, check-in online con cumplimiento de la normativa SES Hospedajes (reporte obligatorio a la Policia Nacional), menu del dia del restaurante, y multiidioma (espanol, galego, ingles) para la clientela internacional.
 
-- **Backend**: Python 3.11–3.13 con Django 5.2 LTS
-- **Base de Datos**: SQLite (desarrollo) / PostgreSQL (producción)
-- **Frontend**: Django Templates + Bootstrap 5
-- **Librerías**: 
-  - python-decouple (gestión de variables de entorno)
-  - django-crispy-forms + crispy-bootstrap5 (formularios)
-  - reportlab (PDFs)
-  - openpyxl (Excel)
-  - Pillow (procesamiento de imágenes)
-  - Flatpickr (calendario frontend)
+## Funcionalidades
 
-## 🚀 Instalación
+- Reservas online con calendario de disponibilidad en tiempo real y bloqueo de fechas ocupadas
+- Check-in online con validacion de DNI/NIE mediante algoritmo oficial espanol
+- Gestion de menu del dia y menus especiales para el restaurante
+- Perfiles de cliente con historial de reservas
+- Panel de administracion Django para gestion de habitaciones, reservas y clientes
+- Multiidioma: espanol (por defecto), galego e ingles
+- Cumplimiento RGPD, LSSI-CE y LOPDGDD
+- Sanitizacion de inputs, rate limiting en endpoints POST, gestion segura de credenciales via variables de entorno
 
-### 1. Clonar el repositorio
-```powershell
-git clone https://github.com/TU_USUARIO/WEB-HOTEL.git
-cd WEB-HOTEL
-```
+## Stack tecnologico
 
-### 2. Crear entorno virtual
-```powershell
+- **Backend**: Python 3.11-3.13 con Django 5.2 LTS
+- **Base de datos**: SQLite (desarrollo) / PostgreSQL (produccion)
+- **Frontend**: Django Templates + Bootstrap 5 (CDN)
+- **Librerias principales**: python-decouple, django-crispy-forms, crispy-bootstrap5, reportlab, openpyxl, Pillow, python-stdnum, django-ratelimit, Flatpickr
+
+## Instalacion
+
+```bash
+git clone https://github.com/reiloop/hotel-manager.git
+cd hotel-manager
 python -m venv venv
-.\venv\Scripts\Activate.ps1  # En Windows PowerShell
-# O en Linux/Mac: source venv/bin/activate
-```
-
-### 3. Instalar dependencias
-```powershell
+source venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
-```
-
-### 4. Configurar variables de entorno
-```powershell
-# Copiar el archivo de ejemplo
-copy .env.example .env
-
-# Editar .env con tus valores
-# IMPORTANTE: Cambia SECRET_KEY por una clave aleatoria segura
-# Puedes generarla en: https://djecrety.ir/
-```
-
-### 5. Compilar traducciones
-```powershell
+cp .env.example .env
+# Editar .env con valores seguros (SECRET_KEY, DEBUG=True para desarrollo)
 python compile_mo.py
-```
-
-### 6. Migrar base de datos
-```powershell
 python manage.py migrate
-```
-
-### 7. Crear superusuario
-```powershell
 python manage.py createsuperuser
-```
-
-### 8. Cargar datos de prueba (opcional)
-```powershell
-# Si tienes fixtures preparados
-python manage.py loaddata fixtures/inicial.json
-```
-
-### 9. Ejecutar servidor de desarrollo
-```powershell
 python manage.py runserver
 ```
 
 Accede a: http://127.0.0.1:8000/
 
-## 📂 Estructura del Proyecto
+## Estructura del proyecto
 
 ```
-WEB HOTEL/
-├── hotel_project/          # Configuración Django
-│   ├── settings.py        # Configuración principal (usa .env)
+hotel-manager/
+├── hotel_project/          # Configuracion Django
+│   ├── settings.py        # Configuracion principal (usa .env)
 │   ├── urls.py            # URLs principales
 │   └── wsgi.py
 ├── reservas/              # App principal
-│   ├── models.py         # Modelos: Cliente, Habitación, Reserva
-│   ├── views.py          # Vistas y lógica de negocio
+│   ├── models.py         # 7+ modelos: Cliente, Habitacion, Reserva, ViajeroCheckin, MenuDelDia, etc.
+│   ├── views.py          # Vistas y logica de negocio
 │   ├── forms.py          # Formularios de registro, reserva, perfil
 │   ├── admin.py          # Panel administrativo
 │   ├── urls.py           # URLs de la app
 │   └── templates/        # Plantillas HTML
-│       └── reservas/
-│           ├── base.html
-│           ├── home.html
-│           ├── listado_habitaciones.html
-│           ├── crear_reserva.html
-│           └── ...
-├── static/               # Archivos estáticos
-│   ├── css/
-│   ├── js/
-│   └── images/
-│       ├── logo/
-│       ├── background/
-│       ├── galeria/
-│       ├── iconos/
-│       └── via_kunig/
-├── media/                # Uploads de usuarios (no incluido en repo)
+├── static/               # Archivos estaticos (logo, background)
 ├── locale/               # Traducciones (ES, GL, EN)
-│   ├── es/LC_MESSAGES/
-│   ├── gl/LC_MESSAGES/
-│   └── en/LC_MESSAGES/
 ├── .env.example          # Plantilla de variables de entorno
-├── .gitignore            # Archivos excluidos de Git
 ├── requirements.txt      # Dependencias Python
 ├── compile_mo.py         # Script para compilar traducciones
 └── manage.py             # CLI de Django
 ```
 
-## 🔐 Seguridad
+## Internacionalizacion
 
-### Variables de entorno
-El proyecto usa `python-decouple` para gestión segura de configuración:
+El proyecto soporta 3 idiomas: espanol (por defecto), galego e ingles. Las URLs usan `i18n_patterns` sin prefijo para el idioma por defecto.
 
-- ✅ **SECRET_KEY**: Clave secreta de Django (nunca la expongas)
-- ✅ **DEBUG**: Modo debug (True en desarrollo, False en producción)
-- ✅ **ALLOWED_HOSTS**: Hosts permitidos
-- ✅ **DATABASE**: Configuración de base de datos
-- ✅ **EMAIL**: Credenciales de email (si se usa)
+Para editar traducciones:
+1. Editar los archivos `.po` en `locale/[idioma]/LC_MESSAGES/django.po`
+2. Ejecutar `python manage.py compilemessages` (o `python compile_mo.py` como fallback)
+3. Commitear `.po` y `.mo` juntos
 
-### Archivos no incluidos en el repositorio
-Por seguridad, estos archivos están en `.gitignore`:
-- `.env` (variables de entorno)
-- `db.sqlite3` (base de datos local)
-- `/media` (archivos subidos por usuarios)
-- `*.log` (logs)
-- `__pycache__/`, `.pyc` (archivos compilados)
+## Seguridad
 
-## 🌍 Internacionalización
+- Variables de entorno gestionadas con `python-decouple`
+- `SECRET_KEY` aleatoria (50+ caracteres), `DEBUG=False` en produccion
+- `strip_tags()` en todos los inputs de usuario
+- Validacion de DNI/NIE con `python-stdnum`
+- Rate limiting con `django-ratelimit` en endpoints POST
+- Proteccion CSRF, XSS, SQL injection (ORM Django), HSTS, cookies seguras
+- Ses Hospedajes: campos y flujos documentados en `GUIA_SES_HOSPEDAJES_CHECKIN.md`
 
-El proyecto soporta 3 idiomas:
-- 🇪🇸 Español (por defecto)
-- 🇬🇱 Gallego
-- 🇬🇧 Inglés
+## Despliegue
 
-Para añadir/editar traducciones:
-1. Edita los archivos `.po` en `locale/[idioma]/LC_MESSAGES/django.po`
-2. Ejecuta `python compile_mo.py` para compilar
+Ver `DEPLOYMENT.md` y `dokploy.md` para guias de despliegue en produccion (Gunicorn + WhiteNoise + PostgreSQL).
 
-## 📋 Funcionalidades Principales
+## Contribuciones
 
-### Para Clientes
-- ✅ Registro y autenticación
-- ✅ Ver habitaciones disponibles
-- ✅ Crear reservas con validación de fechas
-- ✅ Ver calendario de disponibilidad
-- ✅ Editar perfil personal
-- ✅ Historial de reservas
+Las contribuciones son bienvenidas. Ver `CONTRIBUTING.md` para la guia completa.
 
-### Para Administradores
-- ✅ Panel de administración Django
-- ✅ Gestión de habitaciones
-- ✅ Gestión de reservas
-- ✅ Gestión de clientes
-- ✅ Visualización de ocupación
+## Licencia
 
-## 🚀 Despliegue en Producción
+Codigo abierto bajo licencia MIT.
 
-### Configuración recomendada
+## Contacto
 
-1. **Variables de entorno**:
-```bash
-SECRET_KEY=tu-clave-super-secreta-de-50-caracteres-aleatorios
-DEBUG=False
-ALLOWED_HOSTS=tudominio.com,www.tudominio.com
-DB_ENGINE=django.db.backends.postgresql
-DB_NAME=hotel_production
-DB_USER=hotel_user
-DB_PASSWORD=password_seguro
-DB_HOST=localhost
-DB_PORT=5432
-```
-
-2. **Base de datos**: Migra a PostgreSQL
-3. **Archivos estáticos**: Ejecuta `python manage.py collectstatic`
-4. **Servidor web**: Usa Gunicorn + Nginx
-5. **HTTPS**: Configura certificado SSL
-
-### Ejemplo con Gunicorn
-```bash
-pip install gunicorn
-gunicorn hotel_project.wsgi:application --bind 0.0.0.0:8000
-```
-
-## 🤝 Contribuciones
-
-Las contribuciones son bienvenidas. Por favor:
-1. Fork el proyecto
-2. Crea una rama (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -m 'Añadir nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abre un Pull Request
-
-## 📝 Licencia
-
-Este proyecto es de código abierto bajo licencia MIT.
-
-## 📧 Contacto
-
-Para consultas: info@hostalrivera.es
-
----
-
-**Desarrollado con ❤️ usando Django**
+Hostal Rivera - Becerrea, Lugo, Galicia
+Telefono: +34 982 360 185
+Email: info@hostalrivera.es

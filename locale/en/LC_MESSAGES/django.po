@@ -299,8 +299,8 @@ msgstr "Explore our rooms and make your first reservation!"
 msgid "Ver Detalles"
 msgstr "View Details"
 
-msgid "✓ ¡Reserva Confirmada!"
-msgstr "✓ Reservation Confirmed!"
+msgid " ¡Reserva Confirmada!"
+msgstr " Reservation Confirmed!"
 
 msgid "Tu código de reserva es:"
 msgstr "Your reservation code is:"
@@ -628,16 +628,16 @@ msgid "Más información sobre cookies"
 msgstr "More information about cookies"
 
 #: base.html
-msgid "❌ Rechazar todo"
-msgstr "❌ Reject all"
+msgid " Rechazar todo"
+msgstr " Reject all"
 
 #: base.html
-msgid "✓ Solo esenciales"
-msgstr "✓ Essential only"
+msgid " Solo esenciales"
+msgstr " Essential only"
 
 #: base.html
-msgid "✓✓ Aceptar todo"
-msgstr "✓✓ Accept all"
+msgid " Aceptar todo"
+msgstr " Accept all"
 
 #: via_kunig.html
 msgid "Vía Künig: Descubre la Ruta"

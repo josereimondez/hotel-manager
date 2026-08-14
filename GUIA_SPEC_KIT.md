@@ -107,7 +107,7 @@ El AI genera un documento `specs/` con:
 ```
 
 Describe el tech stack:
-> "Django 5.0.2, modelo Factura relacionado con Reserva, generacion PDF con Reportlab (ya instalado), endpoint de descarga, email con Django email backend, migraciones para nuevos campos."
+> "Django 5.2.4, modelo Factura relacionado con Reserva, generacion PDF con Reportlab (ya instalado), endpoint de descarga, email con Django email backend, migraciones para nuevos campos."
 
 El AI genera un plan con:
 - Modelos nuevos a crear
@@ -230,17 +230,17 @@ Despues de `specify init`:
 
 ```
 hotel-manager/
-├── .specify/
-│   ├── memory/          # Contexto del proyecto
-│   ├── templates/       # Templates de specs, plans, tasks
-│   └── scripts/         # Scripts de apoyo
-├── specs/               # Specs generadas por feature
-│   └── 001-facturacion/
-│       ├── spec.md      # Especificacion
-│       ├── plan.md      # Plan tecnico
-│       └── tasks.md     # Lista de tareas
-├── .specify/            # Configuracion de Spec-Kit
-└── ...                  # Tu codigo existente
+ .specify/
+ memory/ # Contexto del proyecto
+ templates/ # Templates de specs, plans, tasks
+ scripts/ # Scripts de apoyo
+ specs/ # Specs generadas por feature
+ 001-facturacion/
+ spec.md # Especificacion
+ plan.md # Plan tecnico
+ tasks.md # Lista de tareas
+ .specify/ # Configuracion de Spec-Kit
+ ... # Tu codigo existente
 ```
 
 ---

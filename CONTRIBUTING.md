@@ -1,15 +1,15 @@
 # Guía de Contribución
 
-¡Gracias por tu interés en contribuir al proyecto Hostal Rivera! 🎉
+¡Gracias por tu interés en contribuir al proyecto Hostal Rivera! 
 
-## 🤝 Cómo Contribuir
+## Cómo Contribuir
 
 ### 1. Fork el Proyecto
 Haz un fork del repositorio a tu cuenta de GitHub.
 
 ### 2. Clona tu Fork
 ```powershell
-git clone https://github.com/TU_USUARIO/WEB-HOTEL.git
+git clone https://github.com/reiloop/WEB-HOTEL.git
 cd WEB-HOTEL
 ```
 
@@ -17,8 +17,8 @@ cd WEB-HOTEL
 ```powershell
 # Crear entorno virtual
 python -m venv venv
-.\venv\Scripts\Activate.ps1  # Windows
-# source venv/bin/activate    # Linux/Mac
+.\venv\Scripts\Activate.ps1 # Windows
+# source venv/bin/activate # Linux/Mac
 
 # Instalar dependencias
 pip install -r requirements.txt
@@ -74,7 +74,7 @@ git push origin feature/nombre-de-tu-funcionalidad
 - Describe claramente qué cambios introduces y por qué
 - Referencia issues relacionados si los hay
 
-## 📝 Estilo de Código
+## Estilo de Código
 
 ### Python/Django
 - Sigue [PEP 8](https://pep8.org/)
@@ -97,7 +97,7 @@ git push origin feature/nombre-de-tu-funcionalidad
 - Añade comentarios para lógica compleja
 - Preferiblemente vanilla JS o usa librerías ya incluidas
 
-## 🔍 Convención de Commits
+## Convención de Commits
 
 Usamos [Conventional Commits](https://www.conventionalcommits.org/):
 
@@ -120,18 +120,18 @@ test: Añadir tests para modelo de Reserva
 chore: Actualizar dependencias
 ```
 
-## 🐛 Reportar Bugs
+## Reportar Bugs
 
 Si encuentras un bug:
-1. Verifica que no esté ya reportado en [Issues](https://github.com/TU_USUARIO/WEB-HOTEL/issues)
+1. Verifica que no esté ya reportado en [Issues](https://github.com/reiloop/WEB-HOTEL/issues)
 2. Crea un nuevo issue con:
-   - Descripción clara del problema
-   - Pasos para reproducirlo
-   - Comportamiento esperado vs actual
-   - Screenshots si es visual
-   - Información del entorno (OS, Python version, etc.)
+ - Descripción clara del problema
+ - Pasos para reproducirlo
+ - Comportamiento esperado vs actual
+ - Screenshots si es visual
+ - Información del entorno (OS, Python version, etc.)
 
-## 💡 Sugerir Mejoras
+## Sugerir Mejoras
 
 Para proponer nuevas funcionalidades:
 1. Abre un issue etiquetado como "enhancement"
@@ -139,14 +139,14 @@ Para proponer nuevas funcionalidades:
 3. Propón una posible implementación si tienes ideas
 4. Espera feedback antes de empezar a codear
 
-## 🌍 Traducciones
+## Traducciones
 
 Para contribuir con traducciones:
 1. Edita los archivos `.po` en `locale/[idioma]/LC_MESSAGES/`
 2. Compila con `python compile_mo.py`
 3. Prueba que las traducciones se vean correctamente
 
-## ✅ Checklist Pre-Pull Request
+## Checklist Pre-Pull Request
 
 Antes de abrir un PR, verifica:
 - [ ] El código funciona correctamente
@@ -157,21 +157,21 @@ Antes de abrir un PR, verifica:
 - [ ] No se incluyen archivos sensibles (.env, db.sqlite3, etc.)
 - [ ] El código sigue las convenciones del proyecto
 
-## 🙏 Código de Conducta
+## Código de Conducta
 
 - Sé respetuoso con otros contribuidores
 - Acepta críticas constructivas
 - Enfócate en lo mejor para el proyecto
 - Ayuda a otros cuando puedas
 
-## 📚 Recursos Útiles
+## Recursos Útiles
 
 - [Documentación de Django](https://docs.djangoproject.com/)
 - [Bootstrap 5 Docs](https://getbootstrap.com/docs/5.0/)
 - [Git Flow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
 - [Markdown Guide](https://www.markdownguide.org/)
 
-## 🎯 Áreas que Necesitan Ayuda
+## Áreas que Necesitan Ayuda
 
 Actualmente buscamos contribuciones en:
 - [ ] Sistema de tests unitarios
@@ -184,4 +184,4 @@ Actualmente buscamos contribuciones en:
 
 ---
 
-**¡Gracias por contribuir!** 🚀
+**¡Gracias por contribuir!** 

@@ -8,40 +8,40 @@ Guia completa para autohostear la web de Hostal Rivera en un servidor Proxmox co
 
 ```
 Internet
-   │
-   ▼
-┌─────────────────────────┐
-│  Cloudflare (DNS+Proxy) │  ← SSL, DDoS protection, WAF basico
-│  DDNS actualiza IP      │
-└────────┬────────────────┘
-         │ Puerto 80/443
-         ▼
-┌─────────────────────────┐
-│  Router Movistar        │  ← Port forwarding 80→VM, 443→VM
-│  (NAT)                  │
-└────────┬────────────────┘
-         │
-         ▼
-┌─────────────────────────────────────────────────────┐
-│              PROXMOX (ZFS, 1 nodo)                   │
-│                                                      │
-│  ┌──────────────────────────────────────────────┐   │
-│  │  VM Ubuntu 24.04 LTS (Dokploy)               │   │
-│  │  ┌────────────────────────────────────────┐  │   │
-│  │  │  Traefik (reverse proxy + SSL LE)      │  │   │
-│  │  │  PostgreSQL (servicio Dokploy)         │  │   │
-│  │  │  Django App (Dockerfile → Gunicorn)    │  │   │
-│  │  │  Volumenes: media, postgres, backups   │  │   │
-│  │  └────────────────────────────────────────┘  │   │
-│  └──────────────────────────────────────────────┘   │
-│                                                      │
-│  Proxmox Backup (VM completa, diario)               │
-└─────────────────────────────────────────────────────┘
-         │
-         ▼ (USB)
-┌─────────────────────────┐
-│  SAI Salicru 1200       │  ← NUT para shutdown seguro
-└─────────────────────────┘
+ 
+ 
+
+ Cloudflare (DNS+Proxy) ← SSL, DDoS protection, WAF basico
+ DDNS actualiza IP 
+
+ Puerto 80/443
+ 
+
+ Router Movistar ← Port forwarding 80→VM, 443→VM
+ (NAT) 
+
+ 
+ 
+
+ PROXMOX (ZFS, 1 nodo) 
+ 
+ 
+ VM Ubuntu 24.04 LTS (Dokploy) 
+ 
+ Traefik (reverse proxy + SSL LE) 
+ PostgreSQL (servicio Dokploy) 
+ Django App (Dockerfile → Gunicorn) 
+ Volumenes: media, postgres, backups 
+ 
+ 
+ 
+ Proxmox Backup (VM completa, diario) 
+
+ 
+ (USB)
+
+ SAI Salicru 1200 ← NUT para shutdown seguro
+
 ```
 
 ---
@@ -67,11 +67,11 @@ MODE=standalone
 Editar `/etc/nut/ups.conf`:
 ```
 [salicru1200]
-    driver = blazer_usb
-    port = auto
-    desc = "Salicru SPS 1200"
-    vendorid = 0665
-    productid = 5161
+ driver = blazer_usb
+ port = auto
+ desc = "Salicru SPS 1200"
+ vendorid = 0665
+ productid = 5161
 ```
 
 > Nota: El vendorid/productid puede variar. Verifica con `lsusb` que tu Salicru aparece.
@@ -84,9 +84,9 @@ LISTEN 127.0.0.1 3493
 Editar `/etc/nut/upsd.users`:
 ```
 [admin]
-    password = tu-contrasena-segura
-    actions = SET
-    instcmds = ALL
+ password = tu-contrasena-segura
+ actions = SET
+ instcmds = ALL
 ```
 
 Editar `/etc/nut/upsmon.conf`:
@@ -265,9 +265,9 @@ curl -sSL https://dokploy.com/install.sh | sh
 
 - No expongas el puerto 3000 al exterior
 - Accede al panel solo desde tu red local o via SSH tunnel:
-  ```bash
-  ssh -L 3000:localhost:3000 admin@<IP-VM>
-  ```
+ ```bash
+ ssh -L 3000:localhost:3000 admin@<IP-VM>
+ ```
 - Luego abre `http://localhost:3000` en tu navegador
 
 ---
@@ -283,9 +283,9 @@ Compra tu dominio (ej: `riverabecerrea.com`) en cualquier registrador.
 1. Anade tu dominio a Cloudflare
 2. Cambia los nameservers del registrador a los de Cloudflare
 3. Crea registros DNS:
-   - **Tipo A**: `@` → IP publica de tu router
-   - **Tipo A**: `www` → IP publica de tu router
-   - **Proxy status**: Proxied (naranja)
+ - **Tipo A**: `@` → IP publica de tu router
+ - **Tipo A**: `www` → IP publica de tu router
+ - **Proxy status**: Proxied (naranja)
 
 ### 5.3 DDNS
 
@@ -312,7 +312,7 @@ En el panel de Dokploy:
 1. **New Project** → Nombre: `hostal-rivera`
 2. **Add Service** → **Application**
 3. **Source**: Git Repository
-4. **Repository URL**: `https://github.com/TU_USUARIO/WEB-HOTEL.git`
+4. **Repository URL**: `https://github.com/reiloop/WEB-HOTEL.git`
 5. **Branch**: `main`
 6. **Build type**: Dockerfile
 7. **Dockerfile path**: `Dockerfile` (raiz del repo)
@@ -483,10 +483,10 @@ rclone sync remoto:backups-hostal/20250101 /tmp/restore
 1. Haz push a `main` en GitHub
 2. Dokploy detecta el cambio y hace build automatico
 3. Ejecuta migraciones desde la consola del contenedor:
-   ```bash
-   python manage.py migrate
-   python manage.py collectstatic --noinput
-   ```
+ ```bash
+ python manage.py migrate
+ python manage.py collectstatic --noinput
+ ```
 4. Verifica que la app funciona
 
 ### Actualizacion manual
