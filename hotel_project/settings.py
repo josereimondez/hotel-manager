@@ -223,3 +223,13 @@ if not DEBUG:
     X_FRAME_OPTIONS = 'DENY'
     SECURE_REFERRER_POLICY = 'same-origin'
     SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+
+
+# SES Hospedajes - Integración con sistema de registro de viajeros
+# Configuración para envío automático de partes a la Policía Nacional
+SES_HOSPEDAJES_ENABLED = config('SES_HOSPEDAJES_ENABLED', default=False, cast=bool)
+SES_HOSPEDAJES_ENV = config('SES_HOSPEDAJES_ENV', default='produccion')
+SES_HOSPEDAJES_ENDPOINT = config('SES_HOSPEDAJES_ENDPOINT', default='')
+SES_HOSPEDAJES_USER = config('SES_HOSPEDAJES_USER', default='')
+SES_HOSPEDAJES_PASSWORD = config('SES_HOSPEDAJES_PASSWORD', default='')
+SES_HOSPEDAJES_TIMEOUT = config('SES_HOSPEDAJES_TIMEOUT', default=20, cast=int)

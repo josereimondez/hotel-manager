@@ -31,7 +31,7 @@ Pylint uses `.pylintrc` (pylint_django plugin, max-line-length=130, migrations a
 - Admin URL is env-configurable: `ADMIN_PATH` (default `admin/`), resolved in `hotel_project/urls.py`.
 - Rate limiting: `@ratelimit` decorators in `reservas/views.py` + `reservas/middleware.py::RatelimitMiddleware` renders `reservas/error_ratelimit.html` with HTTP 429. New POST endpoints should get a rate limit.
 - DB is env-driven: SQLite by default, PostgreSQL in production (`DB_ENGINE`/`DB_NAME`/...). Static files served by WhiteNoise (`STORAGES['staticfiles']['BACKEND']` = CompressedManifest).
-- SES Hospedajes (mandatory Spanish police traveler reporting): `Reserva.ses_hospedajes_*` fields and `ViajeroCheckin` model exist; the flow is documented in `GUIA_SES_HOSPEDAJES_CHECKIN.md`. DNI/NIE validation lives in `reservas/models.py::validar_dni_nie` (python-stdnum).
+- SES Hospedajes (mandatory Spanish police traveler reporting): `Reserva.ses_hospedajes_*` fields and `ViajeroCheckin` model exist; the flow is documented in `GUIA_SES_HOSPEDAJES_CHECKIN.md`. DNI/NIE validation lives in `reservas/models.py::validar_dni_nie` (python-stdnum). Environment variables for SES integration: `SES_HOSPEDAJES_ENABLED` (bool, default False), `SES_HOSPEDAJES_ENV` (produccion/preproduccion), `SES_HOSPEDAJES_ENDPOINT` (URL), `SES_HOSPEDAJES_USER`, `SES_HOSPEDAJES_PASSWORD`, `SES_HOSPEDAJES_TIMEOUT` (int, default 20). When `SES_HOSPEDAJES_ENABLED=False`, the system operates in mock mode for development.
 - Deploy: Dokploy on a VPS, Gunicorn + WhiteNoise — see `dokploy.md` and `DEPLOYMENT.md` before touching deploy config.
 
 ## CI

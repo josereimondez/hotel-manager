@@ -23,6 +23,7 @@ urlpatterns = [
     path('reservar/<int:habitacion_id>/', views.crear_reserva, name='crear_reserva'),
     path('reserva/<int:id>/', views.detalle_reserva, name='detalle_reserva'),
     path('reserva/<int:id>/checkin-online/', views.checkin_online_reserva, name='checkin_online_reserva'),
+    path('reserva/<int:id>/omitir-checkin/', views.omitir_checkin_online, name='omitir_checkin_online'),
     path('mis-reservas/', views.mis_reservas, name='mis_reservas'),
 
     # Páginas Legales (RGPD, LSSI-CE)
@@ -42,4 +43,11 @@ urlpatterns = [
     # Perfil de usuario
     path('perfil/', views.mi_perfil, name='mi_perfil'),
     path('perfil/editar/', views.editar_perfil, name='editar_perfil'),
+
+    # Staff - Check-in presencial y gestión
+    path('staff/reserva/<int:id>/', views.detalle_reserva_staff, name='detalle_reserva_staff'),
+    path('staff/reserva/<int:id>/checkin-presencial/', views.checkin_presencial_staff, name='checkin_presencial_staff'),
+    path('staff/reserva/<int:id>/enviar-ses/', views.enviar_ses_hospedajes, name='enviar_ses_hospedajes'),
+    path('staff/cliente/<int:cliente_id>/derechos-rgpd/', views.derechos_rgpd_cliente, name='derechos_rgpd_cliente'),
+    path('staff/auditoria/', views.historial_auditoria, name='historial_auditoria'),
 ]

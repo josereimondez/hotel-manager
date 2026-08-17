@@ -1,0 +1,173 @@
+{% extends 'reservas/base.html' %}
+{% load i18n %}
+
+{% block title %}Derechos RGPD - {{ cliente.nombre }} {{ cliente.apellidos }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">{% trans "Derechos RGPD" %}</h1>
+        <a href="{% url 'admin:reservas_cliente_change' cliente.id %}" class="btn btn-outline-secondary btn-sm">
+            {% trans "Editar en Admin" %}
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">{% trans "Información del Cliente" %}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>{% trans "Nombre" %}:</strong> {{ cliente.nombre }} {{ cliente.apellidos }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>{% trans "DNI/NIE" %}:</strong> {{ cliente.dni_nie }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>{% trans "Email" %}:</strong> {{ cliente.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>{% trans "Teléfono" %}:</strong> {{ cliente.telefono }}
+                        </div>
+                    </div>
+                    {% if cliente.direccion %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <strong>{% trans "Dirección" %}:</strong> {{ cliente.direccion }}, {{ cliente.codigo_postal }} {{ cliente.ciudad }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>{% trans "Fecha de registro" %}:</strong> {{ cliente.fecha_registro|date:"d/m/Y H:i" }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>{% trans "Reservas" %}:</strong> {{ reservas.count }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">{% trans "Consentimientos RGPD" %}</h5>
+                </div>
+                <div class="card-body">
+                    {% if consentimientos %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans "Fecha" %}</th>
+                                        <th>{% trans "Reserva" %}</th>
+                                        <th>{% trans "Versión" %}</th>
+                                        <th>{% trans "IP" %}</th>
+                                        <th>{% trans "Estado" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for consentimiento in consentimientos %}
+                                    <tr>
+                                        <td>{{ consentimiento.fecha_consentimiento|date:"d/m/Y H:i" }}</td>
+                                        <td>{{ consentimiento.reserva.codigo_reserva }}</td>
+                                        <td>{{ consentimiento.version_politica }}</td>
+                                        <td>{{ consentimiento.ip_address|default:"-" }}</td>
+                                        <td>
+                                            {% if consentimiento.revocado %}
+                                                <span class="badge bg-danger">{% trans "Revocado" %}</span>
+                                            {% else %}
+                                                <span class="badge bg-success">{% trans "Vigente" %}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">{% trans "No hay consentimientos registrados." %}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">{% trans "Ejercicio de Derechos" %}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="{{ form.tipo_derecho.id_for_label }}" class="form-label">
+                                {{ form.tipo_derecho.label }}
+                            </label>
+                            {{ form.tipo_derecho }}
+                            {% if form.tipo_derecho.errors %}
+                                <div class="text-danger small mt-1">{{ form.tipo_derecho.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.descripcion.id_for_label }}" class="form-label">
+                                {{ form.descripcion.label }}
+                            </label>
+                            {{ form.descripcion }}
+                            {% if form.descripcion.errors %}
+                                <div class="text-danger small mt-1">{{ form.descripcion.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                        {% endif %}
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" name="accion" value="exportar" class="btn btn-info">
+                                {% trans "Exportar Datos" %}
+                            </button>
+                            <button type="submit" name="accion" value="rectificar" class="btn btn-warning">
+                                {% trans "Rectificar" %}
+                            </button>
+                            <button type="submit" name="accion" value="anonimizar" class="btn btn-danger"
+                                    onclick="return confirm('{% trans "¿Estás seguro de que quieres anonimizar los datos de este cliente? Esta acción no se puede deshacer." %}');">
+                                {% trans "Anonimizar" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">{% trans "Reservas del Cliente" %}</h5>
+                </div>
+                <div class="card-body">
+                    {% if reservas %}
+                        <ul class="list-unstyled">
+                            {% for reserva in reservas %}
+                            <li class="mb-2">
+                                <a href="{% url 'detalle_reserva_staff' reserva.id %}" class="text-decoration-none">
+                                    {{ reserva.codigo_reserva }}
+                                </a>
+                                <br>
+                                <small class="text-muted">
+                                    {{ reserva.fecha_entrada|date:"d/m/Y" }} - {{ reserva.fecha_salida|date:"d/m/Y" }}
+                                </small>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mb-0">{% trans "No hay reservas registradas." %}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
