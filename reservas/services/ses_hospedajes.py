@@ -124,7 +124,6 @@ def send_payload(payload):
         endpoint = settings.SES_HOSPEDAJES_ENDPOINT
         user = settings.SES_HOSPEDAJES_USER
         password = settings.SES_HOSPEDAJES_PASSWORD
-        timeout = getattr(settings, 'SES_HOSPEDAJES_TIMEOUT', 20)
 
         if not all([endpoint, user, password]):
             logger.error("Credenciales SES Hospedajes incompletas")
@@ -134,12 +133,15 @@ def send_payload(payload):
                 'error': 'Credenciales SES Hospedajes incompletas'
             }
 
-        logger.info(f"Enviando payload a SES Hospedajes: {endpoint}")
+        logger.info("Enviando payload a SES Hospedajes: %s", endpoint)
 
         return {
             'exito': False,
             'referencia': None,
-            'error': 'Integración real con SES Hospedajes no implementada aún. Configure SES_HOSPEDAJES_ENABLED=False para modo mock.'
+            'error': (
+                'Integración real con SES Hospedajes no implementada aún. '
+                'Configure SES_HOSPEDAJES_ENABLED=False para modo mock.'
+            )
         }
 
     except Exception as e:
@@ -179,9 +181,30 @@ def registrar_envio(reserva, exito, referencia, error):
     )
 
     if exito:
-        logger.info(f"SES Hospedajes enviado exitosamente. Referencia: {referencia}")
+        logger.info("SES Hospedajes enviado exitosamente. Referencia: %s", referencia)
     else:
-        logger.error(f"Error enviando a SES Hospedajes: {error}")
+        logger.error("Error enviando a SES Hospedajes: %s", error)
+
+
+def enviar_datos_reserva(reserva):
+    """
+    Construye el payload, envía a SES Hospedajes y registra el resultado.
+
+    Args:
+        reserva: Instancia de Reserva
+
+    Returns:
+        dict: Resultado del envío (mismo formato que send_payload)
+    """
+    payload = build_payload(reserva)
+    resultado = send_payload(payload)
+    registrar_envio(
+        reserva,
+        resultado['exito'],
+        resultado['referencia'],
+        resultado['error']
+    )
+    return resultado
 
 
 def reintentar_envio(reserva):
@@ -200,13 +223,4 @@ def reintentar_envio(reserva):
     if reserva.ses_hospedajes_enviado:
         raise ValueError("El envío a SES Hospedajes ya fue exitoso")
 
-    payload = build_payload(reserva)
-    resultado = send_payload(payload)
-    registrar_envio(
-        reserva,
-        resultado['exito'],
-        resultado['referencia'],
-        resultado['error']
-    )
-
-    return resultado
+    return enviar_datos_reserva(reserva)

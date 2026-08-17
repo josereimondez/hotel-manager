@@ -9,6 +9,7 @@ from django.http import JsonResponse, HttpResponseForbidden
 from django.urls import reverse
 from django.utils.html import strip_tags
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.core.paginator import Paginator
 from django_ratelimit.decorators import ratelimit
 from .models import Habitacion, Cliente, Reserva, MenuDelDia, MenuEspecial, ConsentimientoRGPD, RegistroAuditoria
 from .forms import (ClienteRegistroForm, ReservaForm, RegistroUsuarioForm, EditarUsuarioForm,
@@ -16,7 +17,7 @@ from .forms import (ClienteRegistroForm, ReservaForm, RegistroUsuarioForm, Edita
                     MenuEspecialForm, PlatoMenuEspecialFormSet, CheckinReservaForm,
                     get_viajero_checkin_formset, ConsentimientoRGPDForm, CheckinPresencialForm,
                     EjercicioDerechosForm)
-from .services.ses_hospedajes import build_payload, send_payload, registrar_envio
+from .services.ses_hospedajes import enviar_datos_reserva
 
 
 def home(request):
@@ -322,7 +323,11 @@ def omitir_checkin_online(request, id):  # pylint: disable=redefined-builtin
         ip_address=request.META.get('REMOTE_ADDR')
     )
 
-    messages.warning(request, 'Has omitido el check-in online. Deberás registrarte presencialmente en recepción con tu documentación.')
+    messages.warning(
+        request,
+        'Has omitido el check-in online. Deberás registrarte presencialmente '
+        'en recepción con tu documentación.'
+    )
     return redirect('detalle_reserva', id=reserva.id)
 
 
@@ -866,7 +871,6 @@ def historial_auditoria(request):
     if fecha_hasta:
         registros = registros.filter(fecha_accion__date__lte=fecha_hasta)
 
-    from django.core.paginator import Paginator
     paginator = Paginator(registros, 50)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -909,14 +913,7 @@ def enviar_ses_hospedajes(request, id):  # pylint: disable=redefined-builtin
         return redirect('detalle_reserva_staff', id=reserva.id)
 
     try:
-        payload = build_payload(reserva)
-        resultado = send_payload(payload)
-        registrar_envio(
-            reserva,
-            resultado['exito'],
-            resultado['referencia'],
-            resultado['error']
-        )
+        resultado = enviar_datos_reserva(reserva)
 
         if resultado['exito']:
             messages.success(request, f'Datos enviados a SES Hospedajes. Referencia: {resultado["referencia"]}')
