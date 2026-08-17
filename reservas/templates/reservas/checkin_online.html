@@ -172,18 +172,45 @@
  </div>
  {% endfor %}
 
- {% if reserva_form.non_field_errors %}
- <div class="alert alert-danger">{{ reserva_form.non_field_errors }}</div>
- {% endif %}
+{% if reserva_form.non_field_errors %}
+<div class="alert alert-danger">{{ reserva_form.non_field_errors }}</div>
+{% endif %}
 
- <div class="d-flex gap-2">
- <a href="{% url 'detalle_reserva' reserva.id %}" class="btn btn-outline-secondary">
- {% trans "Volver" %}
- </a>
- <button type="submit" class="btn btn-primary ms-auto">
- {% trans "Guardar check-in online" %}
- </button>
- </div>
+<div class="border rounded p-3 mb-4 bg-light">
+<h2 class="h5 mb-3">{% trans "Protección de datos personales" %}</h2>
+<p class="small text-muted mb-3">
+{% trans "Debes aceptar el tratamiento de tus datos personales para completar el check-in. Tus datos serán utilizados para:" %}
+</p>
+<ul class="small text-muted mb-3">
+<li>{% trans "Gestión de la reserva y prestación del servicio de hospedaje" %}</li>
+<li>{% trans "Cumplimiento de la obligación legal de registro y comunicación a SES Hospedajes (Policía Nacional)" %}</li>
+<li>{% trans "Conservación de los datos durante el plazo legal de 3 años" %}</li>
+</ul>
+<p class="small text-muted mb-3">
+{% trans "Puedes ejercer tus derechos de acceso, rectificación, supresión, limitación, portabilidad y oposición contactando con el hotel." %}
+</p>
+<p class="small mb-3">
+<a href="{% url 'politica_privacidad' %}" target="_blank">{% trans "Más información en la Política de Privacidad" %}</a>
+</p>
+<div class="form-check">
+{{ consentimiento_form.acepto_consentimiento }}
+<label class="form-check-label fw-semibold" for="{{ consentimiento_form.acepto_consentimiento.id_for_label }}">
+{% trans "Acepto el tratamiento de mis datos personales para las finalidades descritas" %}
+</label>
+{% if consentimiento_form.acepto_consentimiento.errors %}
+<div class="text-danger small mt-1">{{ consentimiento_form.acepto_consentimiento.errors }}</div>
+{% endif %}
+</div>
+</div>
+
+<div class="d-flex gap-2">
+<a href="{% url 'detalle_reserva' reserva.id %}" class="btn btn-outline-secondary">
+{% trans "Volver" %}
+</a>
+<button type="submit" class="btn btn-primary ms-auto">
+{% trans "Guardar check-in online" %}
+</button>
+</div>
  </div>
  </form>
  </div>

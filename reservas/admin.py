@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import (Habitacion, Cliente, Reserva, MenuDelDia, PlatoMenuDelDia,
-                     MenuEspecial, PlatoMenuEspecial, ViajeroCheckin)
+                     MenuEspecial, PlatoMenuEspecial, ViajeroCheckin,
+                     ConsentimientoRGPD, RegistroAuditoria)
 
 
 @admin.register(Habitacion)
@@ -122,6 +123,7 @@ class ReservaAdmin(admin.ModelAdmin):
             'fields': (
                 'medio_pago', 'iban', 'relaciones_parentesco_adultos',
                 'contrato_aceptado', 'checkin_online_completado',
+                'checkin_online_omitido',
                 'ses_hospedajes_enviado', 'ses_hospedajes_referencia'
             )
         }),
@@ -195,3 +197,70 @@ class MenuEspecialAdmin(admin.ModelAdmin):
     search_fields = ['titulo', 'descripcion', 'platos__nombre']
     ordering = ['-fecha_inicio']
     inlines = [PlatoMenuEspecialInline]
+
+
+@admin.register(ConsentimientoRGPD)
+class ConsentimientoRGPDAdmin(admin.ModelAdmin):
+    list_display = ['cliente', 'reserva', 'fecha_consentimiento', 'version_politica', 'revocado']
+    list_filter = ['revocado', 'version_politica', 'fecha_consentimiento']
+    search_fields = ['cliente__nombre', 'cliente__apellidos', 'cliente__dni_nie', 'reserva__id']
+    readonly_fields = ['fecha_consentimiento', 'fecha_revocacion', 'ip_address', 'user_agent']
+    date_hierarchy = 'fecha_consentimiento'
+
+    fieldsets = (
+        ('Información del Consentimiento', {
+            'fields': ('reserva', 'cliente', 'fecha_consentimiento', 'version_politica')
+        }),
+        ('Texto Aceptado', {
+            'fields': ('texto_consentimiento',),
+            'classes': ('collapse',)
+        }),
+        ('Datos Técnicos', {
+            'fields': ('ip_address', 'user_agent'),
+            'classes': ('collapse',)
+        }),
+        ('Revocación', {
+            'fields': ('revocado', 'fecha_revocacion', 'motivo_revocacion'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(RegistroAuditoria)
+class RegistroAuditoriaAdmin(admin.ModelAdmin):
+    list_display = ['fecha_accion', 'usuario', 'tipo_accion', 'entidad_tipo', 'entidad_id', 'descripcion_corta']
+    list_filter = ['tipo_accion', 'entidad_tipo', 'fecha_accion', 'usuario']
+    search_fields = ['descripcion', 'entidad_id', 'usuario__username']
+    readonly_fields = ['fecha_accion', 'usuario', 'tipo_accion', 'entidad_tipo', 'entidad_id',
+                       'descripcion', 'datos_anteriores', 'datos_nuevos', 'ip_address']
+    date_hierarchy = 'fecha_accion'
+
+    fieldsets = (
+        ('Acción', {
+            'fields': ('fecha_accion', 'usuario', 'tipo_accion')
+        }),
+        ('Entidad Afectada', {
+            'fields': ('entidad_tipo', 'entidad_id', 'descripcion')
+        }),
+        ('Datos', {
+            'fields': ('datos_anteriores', 'datos_nuevos'),
+            'classes': ('collapse',)
+        }),
+        ('Técnico', {
+            'fields': ('ip_address',),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def descripcion_corta(self, obj):
+        return obj.descripcion[:100] + '...' if len(obj.descripcion) > 100 else obj.descripcion
+    descripcion_corta.short_description = "Descripción"
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False

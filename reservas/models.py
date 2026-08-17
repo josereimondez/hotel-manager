@@ -335,6 +335,10 @@ class Reserva(models.Model):
         default=False,
         help_text='Indica si se completó el check-in online legal.'
     )
+    checkin_online_omitido = models.BooleanField(
+        default=False,
+        help_text='Indica si el huésped omitió el check-in online.'
+    )
     ses_hospedajes_enviado = models.BooleanField(
         default=False,
         help_text='Indica si el parte fue enviado al servicio web SES Hospedajes.'
@@ -570,6 +574,16 @@ class ViajeroCheckin(models.Model):
         if self.tipo_documento == 'dni' and self.numero_documento:
             validar_dni_nie(self.numero_documento)
 
+        if self.fecha_nacimiento:
+            hoy = date.today()
+            if self.fecha_nacimiento > hoy:
+                raise ValidationError({'fecha_nacimiento': 'La fecha de nacimiento no puede ser futura.'})
+            edad = hoy.year - self.fecha_nacimiento.year - (
+                (hoy.month, hoy.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
+            )
+            if edad > 120:
+                raise ValidationError({'fecha_nacimiento': 'Fecha de nacimiento no válida.'})
+
         telefono_limpio = re.sub(r'[^0-9+]', '', self.telefono_contacto)
         if len(telefono_limpio) < 9:
             raise ValidationError({'telefono_contacto': 'Teléfono inválido. Debe tener al menos 9 dígitos.'})
@@ -723,3 +737,151 @@ class PlatoMenuEspecial(models.Model):
         verbose_name = "Plato del menú especial"
         verbose_name_plural = "Platos del menú especial"
         ordering = ['categoria', 'orden', 'nombre']
+
+
+class ConsentimientoRGPD(models.Model):
+    """Registro auditado del consentimiento explícito del huésped para el tratamiento de datos personales."""
+
+    reserva = models.ForeignKey(
+        Reserva,
+        on_delete=models.CASCADE,
+        related_name='consentimientos_rgpd',
+        help_text='Reserva asociada al consentimiento'
+    )
+    cliente = models.ForeignKey(
+        Cliente,
+        on_delete=models.CASCADE,
+        related_name='consentimientos_rgpd',
+        help_text='Cliente que da el consentimiento'
+    )
+    fecha_consentimiento = models.DateTimeField(
+        auto_now_add=True,
+        help_text='Fecha y hora del consentimiento'
+    )
+    texto_consentimiento = models.TextField(
+        help_text='Texto exacto aceptado por el cliente'
+    )
+    version_politica = models.CharField(
+        max_length=20,
+        help_text='Versión de la política de privacidad aceptada'
+    )
+    ip_address = models.GenericIPAddressField(
+        null=True,
+        blank=True,
+        help_text='IP desde la que se dio el consentimiento'
+    )
+    user_agent = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text='User-Agent del navegador'
+    )
+    revocado = models.BooleanField(
+        default=False,
+        help_text='Indica si el consentimiento fue revocado'
+    )
+    fecha_revocacion = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='Fecha de revocación del consentimiento'
+    )
+    motivo_revocacion = models.TextField(
+        blank=True,
+        help_text='Motivo de la revocación (opcional)'
+    )
+    creado_en = models.DateTimeField(auto_now_add=True)
+    actualizado_en = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Consentimiento {self.cliente} - {self.reserva} ({self.fecha_consentimiento})"
+
+    def clean(self):
+        super().clean()
+        if self.revocado and not self.fecha_revocacion:
+            raise ValidationError({
+                'fecha_revocacion': 'La fecha de revocación es obligatoria si el consentimiento está revocado.'
+            })
+
+    class Meta:
+        verbose_name = "Consentimiento RGPD"
+        verbose_name_plural = "Consentimientos RGPD"
+        ordering = ['-fecha_consentimiento']
+        unique_together = [('reserva', 'cliente')]
+
+
+class RegistroAuditoria(models.Model):
+    """Registro inmutable de todas las acciones relacionadas con datos personales."""
+
+    TIPO_ACCION_CHOICES = [
+        ('creacion', 'Creación de registro'),
+        ('modificacion', 'Modificación de datos'),
+        ('eliminacion', 'Eliminación/anonimización'),
+        ('acceso', 'Acceso a datos'),
+        ('envio_ses', 'Envío a SES Hospedajes'),
+        ('ejercicio_derechos', 'Ejercicio de derechos RGPD'),
+        ('consentimiento', 'Consentimiento dado'),
+        ('revocacion', 'Consentimiento revocado'),
+    ]
+
+    ENTIDAD_TIPO_CHOICES = [
+        ('reserva', 'Reserva'),
+        ('viajero_checkin', 'Viajero Check-in'),
+        ('consentimiento_rgpd', 'Consentimiento RGPD'),
+        ('cliente', 'Cliente'),
+    ]
+
+    fecha_accion = models.DateTimeField(
+        auto_now_add=True,
+        help_text='Fecha y hora de la acción'
+    )
+    usuario = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='registros_auditoria',
+        help_text='Usuario que realizó la acción (null si sistema)'
+    )
+    tipo_accion = models.CharField(
+        max_length=30,
+        choices=TIPO_ACCION_CHOICES,
+        help_text='Tipo de acción realizada'
+    )
+    entidad_tipo = models.CharField(
+        max_length=50,
+        choices=ENTIDAD_TIPO_CHOICES,
+        help_text='Tipo de entidad afectada'
+    )
+    entidad_id = models.PositiveIntegerField(
+        help_text='ID de la entidad afectada'
+    )
+    descripcion = models.TextField(
+        help_text='Descripción de la acción realizada'
+    )
+    datos_anteriores = models.JSONField(
+        null=True,
+        blank=True,
+        help_text='Snapshot de datos antes de la modificación'
+    )
+    datos_nuevos = models.JSONField(
+        null=True,
+        blank=True,
+        help_text='Snapshot de datos después de la modificación'
+    )
+    ip_address = models.GenericIPAddressField(
+        null=True,
+        blank=True,
+        help_text='IP desde la que se realizó la acción'
+    )
+
+    def __str__(self):
+        return f"{self.fecha_accion} - {self.get_tipo_accion_display()} - {self.entidad_tipo}#{self.entidad_id}"
+
+    class Meta:
+        verbose_name = "Registro de auditoría"
+        verbose_name_plural = "Registros de auditoría"
+        ordering = ['-fecha_accion']
+        indexes = [
+            models.Index(fields=['fecha_accion']),
+            models.Index(fields=['entidad_tipo', 'entidad_id']),
+            models.Index(fields=['usuario']),
+        ]

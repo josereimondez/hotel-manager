@@ -685,6 +685,7 @@ class CheckinOnlineVistaTests(VistaTestCase):
                 'viajeros-0-email_contacto': 'pedro@test.com',
                 'viajeros-0-relacion_con_titular': 'titular',
                 'viajeros-0-es_menor_sin_documento': False,
+                'acepto_consentimiento': True,
             }
         )
         self.assertEqual(response.status_code, 302)

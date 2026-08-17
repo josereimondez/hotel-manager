@@ -9,12 +9,15 @@ from django.http import JsonResponse, HttpResponseForbidden
 from django.urls import reverse
 from django.utils.html import strip_tags
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.core.paginator import Paginator
 from django_ratelimit.decorators import ratelimit
-from .models import Habitacion, Cliente, Reserva, MenuDelDia, MenuEspecial
+from .models import Habitacion, Cliente, Reserva, MenuDelDia, MenuEspecial, ConsentimientoRGPD, RegistroAuditoria
 from .forms import (ClienteRegistroForm, ReservaForm, RegistroUsuarioForm, EditarUsuarioForm,
                     EditarClienteForm, CambiarPasswordForm, MenuDelDiaForm, PlatoFormSet,
                     MenuEspecialForm, PlatoMenuEspecialFormSet, CheckinReservaForm,
-                    get_viajero_checkin_formset)
+                    get_viajero_checkin_formset, ConsentimientoRGPDForm, CheckinPresencialForm,
+                    EjercicioDerechosForm)
+from .services.ses_hospedajes import enviar_datos_reserva
 
 
 def home(request):
@@ -145,9 +148,9 @@ def crear_reserva(request, habitacion_id):
                 )
                 messages.info(
                     request,
-                    'Completa ahora el check-in online para cumplir con el registro obligatorio de viajeros.'
+                    'Puedes completar el check-in online ahora o registrarte presencialmente en recepción.'
                 )
-                return redirect('checkin_online_reserva', id=reserva.id)
+                return redirect('detalle_reserva', id=reserva.id)
 
             except Exception as e:
                 messages.error(request, f'Error: {str(e)}')
@@ -228,6 +231,11 @@ def checkin_online_reserva(request, id):  # pylint: disable=redefined-builtin
         Reserva.objects.select_related('habitacion', 'cliente'),
         id=id, cliente__usuario=request.user
     )
+
+    if reserva.checkin_online_omitido:
+        messages.warning(request, 'Ya omitiste el check-in online. Contacta con recepción para registrarte presencialmente.')
+        return redirect('detalle_reserva', id=reserva.id)
+
     min_viajeros_requeridos = max(1, reserva.numero_adultos)
     viajeros_existentes = reserva.viajeros_checkin.count()
     formset_cls = get_viajero_checkin_formset(extra=max(0, min_viajeros_requeridos - viajeros_existentes))
@@ -235,8 +243,9 @@ def checkin_online_reserva(request, id):  # pylint: disable=redefined-builtin
     if request.method == 'POST':
         reserva_form = CheckinReservaForm(request.POST, instance=reserva)
         formset = formset_cls(request.POST, instance=reserva, prefix='viajeros')
+        consentimiento_form = ConsentimientoRGPDForm(request.POST)
 
-        if reserva_form.is_valid() and formset.is_valid():
+        if reserva_form.is_valid() and formset.is_valid() and consentimiento_form.is_valid():
             viajeros_validos = [
                 f for f in formset.forms
                 if f.cleaned_data and not f.cleaned_data.get('DELETE', False)
@@ -251,6 +260,23 @@ def checkin_online_reserva(request, id):  # pylint: disable=redefined-builtin
                 reserva.checkin_online_completado = True
                 reserva.save()
                 formset.save()
+
+                consentimiento_form.save(
+                    reserva=reserva,
+                    cliente=reserva.cliente,
+                    ip_address=request.META.get('REMOTE_ADDR'),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')
+                )
+
+                RegistroAuditoria.objects.create(
+                    usuario=request.user,
+                    tipo_accion='consentimiento',
+                    entidad_tipo='reserva',
+                    entidad_id=reserva.id,
+                    descripcion='Check-in online completado con consentimiento RGPD',
+                    ip_address=request.META.get('REMOTE_ADDR')
+                )
+
                 messages.success(request, 'Check-in online completado correctamente.')
                 return redirect('detalle_reserva', id=reserva.id)
         else:
@@ -258,13 +284,51 @@ def checkin_online_reserva(request, id):  # pylint: disable=redefined-builtin
     else:
         reserva_form = CheckinReservaForm(instance=reserva)
         formset = formset_cls(instance=reserva, prefix='viajeros')
+        consentimiento_form = ConsentimientoRGPDForm()
 
     return render(request, 'reservas/checkin_online.html', {
         'reserva': reserva,
         'reserva_form': reserva_form,
         'formset': formset,
+        'consentimiento_form': consentimiento_form,
         'min_viajeros_requeridos': min_viajeros_requeridos,
     })
+
+
+@login_required
+@ratelimit(key='user', rate='5/h', method='POST', block=True)
+def omitir_checkin_online(request, id):  # pylint: disable=redefined-builtin
+    """Permite al huésped omitir el check-in online y registrarse presencialmente."""
+    if request.method != 'POST':
+        return redirect('detalle_reserva', id=id)
+
+    reserva = get_object_or_404(
+        Reserva.objects.select_related('habitacion', 'cliente'),
+        id=id, cliente__usuario=request.user
+    )
+
+    if reserva.checkin_online_completado:
+        messages.info(request, 'El check-in ya fue completado.')
+        return redirect('detalle_reserva', id=reserva.id)
+
+    reserva.checkin_online_omitido = True
+    reserva.save()
+
+    RegistroAuditoria.objects.create(
+        usuario=request.user,
+        tipo_accion='modificacion',
+        entidad_tipo='reserva',
+        entidad_id=reserva.id,
+        descripcion='Check-in online omitido por el huésped',
+        ip_address=request.META.get('REMOTE_ADDR')
+    )
+
+    messages.warning(
+        request,
+        'Has omitido el check-in online. Deberás registrarte presencialmente '
+        'en recepción con tu documentación.'
+    )
+    return redirect('detalle_reserva', id=reserva.id)
 
 
 @login_required
@@ -616,3 +680,247 @@ def editar_perfil(request):
         'password_form': password_form,
         'cliente': cliente,
     })
+
+
+@login_required
+def detalle_reserva_staff(request, id):  # pylint: disable=redefined-builtin
+    """Vista de detalle de reserva para staff."""
+    if not request.user.is_staff:
+        messages.error(request, 'No tienes permiso para acceder a esta sección.')
+        return redirect('home')
+
+    reserva = get_object_or_404(
+        Reserva.objects.select_related('habitacion', 'cliente'),
+        id=id
+    )
+    viajeros = reserva.viajeros_checkin.all().order_by('orden')
+    consentimientos = reserva.consentimientos_rgpd.all().order_by('-fecha_consentimiento')
+
+    context = {
+        'reserva': reserva,
+        'viajeros': viajeros,
+        'consentimientos': consentimientos,
+    }
+    return render(request, 'reservas/detalle_reserva_staff.html', context)
+
+
+@login_required
+@ratelimit(key='user', rate='30/h', method='POST', block=True)
+def checkin_presencial_staff(request, id):  # pylint: disable=redefined-builtin
+    """Check-in presencial realizado por staff para huéspedes que no hicieron check-in online."""
+    if not request.user.is_staff:
+        messages.error(request, 'No tienes permiso para acceder a esta sección.')
+        return redirect('home')
+
+    reserva = get_object_or_404(
+        Reserva.objects.select_related('habitacion', 'cliente'),
+        id=id
+    )
+
+    if reserva.checkin_online_completado:
+        messages.info(request, 'El check-in ya fue completado.')
+        return redirect('detalle_reserva_staff', id=reserva.id)
+
+    min_viajeros_requeridos = max(1, reserva.numero_adultos)
+    viajeros_existentes = reserva.viajeros_checkin.count()
+    formset_cls = get_viajero_checkin_formset(extra=max(0, min_viajeros_requeridos - viajeros_existentes))
+
+    if request.method == 'POST':
+        reserva_form = CheckinPresencialForm(request.POST, instance=reserva)
+        formset = formset_cls(request.POST, instance=reserva, prefix='viajeros')
+
+        if reserva_form.is_valid() and formset.is_valid():
+            viajeros_validos = [
+                f for f in formset.forms
+                if f.cleaned_data and not f.cleaned_data.get('DELETE', False)
+            ]
+            if len(viajeros_validos) < min_viajeros_requeridos:
+                messages.error(
+                    request,
+                    f'Debes completar al menos {min_viajeros_requeridos} viajero(s) adulto(s) para esta reserva.'
+                )
+            else:
+                reserva = reserva_form.save(commit=False)
+                reserva.checkin_online_completado = True
+                reserva.save()
+                formset.save()
+
+                ConsentimientoRGPD.objects.create(
+                    reserva=reserva,
+                    cliente=reserva.cliente,
+                    texto_consentimiento='Consentimiento físico firmado en recepción',
+                    version_politica='1.0',
+                    ip_address=request.META.get('REMOTE_ADDR'),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')[:500]
+                )
+
+                RegistroAuditoria.objects.create(
+                    usuario=request.user,
+                    tipo_accion='consentimiento',
+                    entidad_tipo='reserva',
+                    entidad_id=reserva.id,
+                    descripcion='Check-in presencial completado por staff con consentimiento físico',
+                    ip_address=request.META.get('REMOTE_ADDR')
+                )
+
+                messages.success(request, 'Check-in presencial completado correctamente.')
+    return redirect('detalle_reserva_staff', id=reserva.id)
+
+
+@login_required
+@ratelimit(key='user', rate='20/h', method='POST', block=True)
+def derechos_rgpd_cliente(request, cliente_id):
+    """Vista para que el staff gestione solicitudes de derechos RGPD de un cliente."""
+    if not request.user.is_staff:
+        messages.error(request, 'No tienes permiso para acceder a esta sección.')
+        return redirect('home')
+
+    cliente = get_object_or_404(Cliente, id=cliente_id)
+    consentimientos = cliente.consentimientos_rgpd.all().order_by('-fecha_consentimiento')
+    reservas = cliente.reservas.all().order_by('-fecha_reserva')
+
+    if request.method == 'POST':
+        form = EjercicioDerechosForm(request.POST)
+        accion = request.POST.get('accion')
+
+        if form.is_valid():
+            tipo_derecho = form.cleaned_data['tipo_derecho']
+            descripcion = form.cleaned_data['descripcion']
+
+            if accion == 'exportar':
+                RegistroAuditoria.objects.create(
+                    usuario=request.user,
+                    tipo_accion='ejercicio_derechos',
+                    entidad_tipo='cliente',
+                    entidad_id=cliente.id,
+                    descripcion=f'Exportación de datos - Derecho: {tipo_derecho}',
+                    ip_address=request.META.get('REMOTE_ADDR')
+                )
+                messages.success(request, f'Datos exportados correctamente. Derecho: {tipo_derecho}')
+
+            elif accion == 'anonimizar':
+                cliente.nombre = 'ANONIMIZADO'
+                cliente.apellidos = 'ANONIMIZADO'
+                cliente.dni_nie = 'ANONIMIZADO'
+                cliente.email = 'anonimizado@example.com'
+                cliente.telefono = 'ANONIMIZADO'
+                cliente.direccion = 'ANONIMIZADO'
+                cliente.save()
+
+                RegistroAuditoria.objects.create(
+                    usuario=request.user,
+                    tipo_accion='ejercicio_derechos',
+                    entidad_tipo='cliente',
+                    entidad_id=cliente.id,
+                    descripcion=f'Anonimización de datos - Derecho: {tipo_derecho}',
+                    ip_address=request.META.get('REMOTE_ADDR')
+                )
+                messages.success(request, 'Datos del cliente anonimizados correctamente.')
+
+            elif accion == 'rectificar':
+                RegistroAuditoria.objects.create(
+                    usuario=request.user,
+                    tipo_accion='ejercicio_derechos',
+                    entidad_tipo='cliente',
+                    entidad_id=cliente.id,
+                    descripcion=f'Rectificación solicitada - Derecho: {tipo_derecho}. Descripción: {descripcion}',
+                    ip_address=request.META.get('REMOTE_ADDR')
+                )
+                messages.success(request, f'Rectificación registrada. Descripción: {descripcion}')
+
+            return redirect('derechos_rgpd_cliente', cliente_id=cliente.id)
+    else:
+        form = EjercicioDerechosForm()
+
+    context = {
+        'cliente': cliente,
+        'consentimientos': consentimientos,
+        'reservas': reservas,
+        'form': form,
+    }
+    return render(request, 'reservas/derechos_rgpd.html', context)
+
+
+@login_required
+@ratelimit(key='user', rate='60/h', method='GET', block=True)
+def historial_auditoria(request):
+    """Vista para que el staff consulte el historial de auditoría."""
+    if not request.user.is_staff:
+        messages.error(request, 'No tienes permiso para acceder a esta sección.')
+        return redirect('home')
+
+    registros = RegistroAuditoria.objects.all().order_by('-fecha_accion')
+
+    tipo_accion = request.GET.get('tipo_accion')
+    if tipo_accion:
+        registros = registros.filter(tipo_accion=tipo_accion)
+
+    entidad_tipo = request.GET.get('entidad_tipo')
+    if entidad_tipo:
+        registros = registros.filter(entidad_tipo=entidad_tipo)
+
+    usuario_id = request.GET.get('usuario')
+    if usuario_id:
+        registros = registros.filter(usuario_id=usuario_id)
+
+    fecha_desde = request.GET.get('fecha_desde')
+    if fecha_desde:
+        registros = registros.filter(fecha_accion__date__gte=fecha_desde)
+
+    fecha_hasta = request.GET.get('fecha_hasta')
+    if fecha_hasta:
+        registros = registros.filter(fecha_accion__date__lte=fecha_hasta)
+
+    paginator = Paginator(registros, 50)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'tipo_accion': tipo_accion,
+        'entidad_tipo': entidad_tipo,
+        'usuario_id': usuario_id,
+        'fecha_desde': fecha_desde,
+        'fecha_hasta': fecha_hasta,
+        'TIPO_ACCION_CHOICES': RegistroAuditoria.TIPO_ACCION_CHOICES,
+        'ENTIDAD_TIPO_CHOICES': RegistroAuditoria.ENTIDAD_TIPO_CHOICES,
+    }
+    return render(request, 'reservas/historial_auditoria.html', context)
+
+
+@login_required
+@ratelimit(key='user', rate='10/h', method='POST', block=True)
+def enviar_ses_hospedajes(request, id):  # pylint: disable=redefined-builtin
+    """Envía los datos de la reserva a SES Hospedajes."""
+    if not request.user.is_staff:
+        messages.error(request, 'No tienes permiso para acceder a esta sección.')
+        return redirect('home')
+
+    if request.method != 'POST':
+        return redirect('detalle_reserva_staff', id=id)
+
+    reserva = get_object_or_404(
+        Reserva.objects.select_related('habitacion', 'cliente'),
+        id=id
+    )
+
+    if not reserva.checkin_online_completado:
+        messages.error(request, 'El check-in debe estar completado antes de enviar a SES Hospedajes.')
+        return redirect('detalle_reserva_staff', id=reserva.id)
+
+    if reserva.ses_hospedajes_enviado:
+        messages.info(request, 'Los datos ya fueron enviados a SES Hospedajes.')
+        return redirect('detalle_reserva_staff', id=reserva.id)
+
+    try:
+        resultado = enviar_datos_reserva(reserva)
+
+        if resultado['exito']:
+            messages.success(request, f'Datos enviados a SES Hospedajes. Referencia: {resultado["referencia"]}')
+        else:
+            messages.error(request, f'Error enviando a SES Hospedajes: {resultado["error"]}')
+
+    except Exception as e:
+        messages.error(request, f'Error inesperado: {str(e)}')
+
+    return redirect('detalle_reserva_staff', id=reserva.id)

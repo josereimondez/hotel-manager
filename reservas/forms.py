@@ -5,7 +5,8 @@ from django.contrib.auth import get_user_model
 from django.utils.html import strip_tags
 
 from .models import (Cliente, Reserva, MenuDelDia, PlatoMenuDelDia,
-                     MenuEspecial, PlatoMenuEspecial, ViajeroCheckin)
+                     MenuEspecial, PlatoMenuEspecial, ViajeroCheckin,
+                     ConsentimientoRGPD)
 
 User = get_user_model()
 
@@ -603,3 +604,109 @@ def get_viajero_checkin_formset(extra=0):
         extra=extra,
         can_delete=True,
     )
+
+
+class CheckinPresencialForm(forms.ModelForm):
+    """Formulario para check-in presencial realizado por staff."""
+
+    modo_presencial = forms.BooleanField(
+        initial=True,
+        required=False,
+        widget=forms.HiddenInput()
+    )
+
+    class Meta:
+        model = Reserva
+        fields = ['relaciones_parentesco_adultos', 'contrato_aceptado']
+        widgets = {
+            'relaciones_parentesco_adultos': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 2,
+                'placeholder': 'Ej: Viajero 1 y viajero 2 son cónyuges.'
+            }),
+            'contrato_aceptado': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+        }
+        labels = {
+            'relaciones_parentesco_adultos': 'Relación de parentesco entre adultos',
+            'contrato_aceptado': 'El huésped ha firmado físicamente el contrato de hospedaje',
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get('contrato_aceptado'):
+            raise forms.ValidationError(
+                'Debes confirmar que el huésped ha firmado el contrato.'
+            )
+        return cleaned_data
+
+
+class EjercicioDerechosForm(forms.Form):
+    """Formulario para ejercicio de derechos RGPD por parte del staff."""
+
+    TIPO_DERECHO_CHOICES = [
+        ('acceso', 'Acceso'),
+        ('rectificacion', 'Rectificación'),
+        ('supresion', 'Supresión'),
+        ('limitacion', 'Limitación'),
+        ('portabilidad', 'Portabilidad'),
+        ('oposicion', 'Oposición'),
+    ]
+
+    tipo_derecho = forms.ChoiceField(
+        choices=TIPO_DERECHO_CHOICES,
+        label='Tipo de derecho',
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    descripcion = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        label='Descripción'
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        tipo_derecho = cleaned_data.get('tipo_derecho')
+        descripcion = cleaned_data.get('descripcion')
+
+        if tipo_derecho == 'rectificacion' and not descripcion:
+            raise forms.ValidationError(
+                'La rectificación requiere una descripción de los cambios a realizar.'
+            )
+
+        return cleaned_data
+
+
+class ConsentimientoRGPDForm(forms.Form):
+    """Formulario para recoger el consentimiento explícito RGPD del huésped."""
+
+    acepto_consentimiento = forms.BooleanField(
+        required=True,
+        label='Acepto el tratamiento de mis datos personales',
+        error_messages={
+            'required': 'Debes aceptar el tratamiento de datos para completar el check-in.'
+        },
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+
+    def save(self, reserva, cliente, ip_address=None, user_agent=None):
+        """Crea el registro de consentimiento RGPD."""
+        texto_consentimiento = (
+            "Acepto el tratamiento de mis datos personales por Hostal Rivera con las siguientes finalidades:\n"
+            "- Gestión de la reserva y prestación del servicio de hospedaje\n"
+            "- Cumplimiento de la obligación legal de registro y comunicación a SES Hospedajes (Policía Nacional)\n"
+            "- Conservación de los datos durante el plazo legal de 3 años\n\n"
+            "Puedo ejercer mis derechos de acceso, rectificación, supresión, limitación, portabilidad y oposición "
+            "contactando con el hotel.\n\n"
+            "Más información en la Política de Privacidad."
+        )
+
+        return ConsentimientoRGPD.objects.create(
+            reserva=reserva,
+            cliente=cliente,
+            texto_consentimiento=texto_consentimiento,
+            version_politica='1.0',
+            ip_address=ip_address,
+            user_agent=user_agent[:500] if user_agent else ''
+        )

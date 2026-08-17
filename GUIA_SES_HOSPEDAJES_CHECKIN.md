@@ -32,14 +32,29 @@ En este proyecto ya tienes la base de datos y pantallas de check-in online:
    - relaciones_parentesco_adultos
    - contrato_aceptado
    - checkin_online_completado
+   - checkin_online_omitido (nuevo: permite al huésped omitir el check-in online)
    - ses_hospedajes_enviado
    - ses_hospedajes_referencia
 
 2. Modelo ViajeroCheckin con datos de identificacion, residencia, contacto y parentesco.
 
-3. Flujo funcional:
-   - Al crear reserva, se redirige a check-in online.
-   - Se exige minimo de viajeros segun adultos de la reserva.
+3. Modelo ConsentimientoRGPD (nuevo):
+   - Registro auditado del consentimiento explícito del huésped
+   - Timestamp, IP, user-agent, versión de política aceptada
+   - Trazabilidad completa para cumplimiento RGPD
+
+4. Modelo RegistroAuditoria (nuevo):
+   - Log inmutable de todas las acciones sobre datos personales
+   - Tipos: consentimiento, envío SES, ejercicio derechos, etc.
+   - Filtros y paginación en panel de staff
+
+5. Flujo funcional:
+   - Al crear reserva, el cliente puede completar check-in online u omitirlo
+   - Check-in online requiere consentimiento RGPD explícito
+   - Check-in presencial disponible para staff (huéspedes que omitieron online)
+   - Envío a SES Hospedajes desde panel de staff (modo mock disponible)
+   - Ejercicio de derechos RGPD (acceso, rectificación, supresión, etc.)
+   - Historial de auditoría completo para staff
 
 ---
 

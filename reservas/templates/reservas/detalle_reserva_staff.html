@@ -1,0 +1,235 @@
+{% extends 'reservas/base.html' %}
+{% load i18n %}
+
+{% block title %}Staff - Reserva {{ reserva.codigo_reserva }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">{% trans "Detalle de Reserva (Staff)" %}</h1>
+        <a href="{% url 'admin:reservas_reserva_change' reserva.id %}" class="btn btn-outline-secondary btn-sm">
+            {% trans "Editar en Admin" %}
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">{% trans "Información de la Reserva" %}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>{% trans "Código" %}:</strong> {{ reserva.codigo_reserva }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>{% trans "Estado" %}:</strong>
+                            <span class="badge bg-{{ reserva.get_estado_color }}">{{ reserva.get_estado_display }}</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>{% trans "Cliente" %}:</strong><br>
+                            {{ reserva.cliente.nombre }} {{ reserva.cliente.apellidos }}<br>
+                            <small class="text-muted">{{ reserva.cliente.email }}</small>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>{% trans "Habitación" %}:</strong><br>
+                            {{ reserva.habitacion }}<br>
+                            <small class="text-muted">{{ reserva.habitacion.get_tipo_display }}</small>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>{% trans "Check-in" %}:</strong> {{ reserva.fecha_entrada|date:"d/m/Y" }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>{% trans "Check-out" %}:</strong> {{ reserva.fecha_salida|date:"d/m/Y" }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>{% trans "Adultos" %}:</strong> {{ reserva.numero_adultos }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>{% trans "Niños" %}:</strong> {{ reserva.numero_ninos }}
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>{% trans "Check-in Online" %}:</strong>
+                            {% if reserva.checkin_online_completado %}
+                                <span class="badge bg-success">{% trans "Completado" %}</span>
+                            {% elif reserva.checkin_online_omitido %}
+                                <span class="badge bg-warning">{% trans "Omitido" %}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{% trans "Pendiente" %}</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>{% trans "SES Hospedajes" %}:</strong>
+                            {% if reserva.ses_hospedajes_enviado %}
+                                <span class="badge bg-success">{% trans "Enviado" %}</span>
+                                {% if reserva.ses_hospedajes_referencia %}
+                                    <br><small class="text-muted">{{ reserva.ses_hospedajes_referencia }}</small>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-danger">{% trans "No enviado" %}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if reserva.checkin_online_completado %}
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">{% trans "Viajeros Registrados" %}</h5>
+                </div>
+                <div class="card-body">
+                    {% if viajeros %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>{% trans "Nombre" %}</th>
+                                        <th>{% trans "Documento" %}</th>
+                                        <th>{% trans "Nacionalidad" %}</th>
+                                        <th>{% trans "Relación" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for viajero in viajeros %}
+                                    <tr>
+                                        <td>{{ viajero.orden }}</td>
+                                        <td>{{ viajero.nombre }} {{ viajero.primer_apellido }}</td>
+                                        <td>
+                                            {{ viajero.get_tipo_documento_display }}
+                                            {% if viajero.es_menor_sin_documento %}
+                                                <span class="badge bg-info">Menor</span>
+                                            {% else %}
+                                                {{ viajero.numero_documento }}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ viajero.nacionalidad }}</td>
+                                        <td>{{ viajero.get_relacion_con_titular_display }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">{% trans "No hay viajeros registrados." %}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">{% trans "Consentimientos RGPD" %}</h5>
+                </div>
+                <div class="card-body">
+                    {% if consentimientos %}
+                        {% for consentimiento in consentimientos %}
+                        <div class="border-bottom pb-2 mb-2">
+                            <strong>{{ consentimiento.fecha_consentimiento|date:"d/m/Y H:i" }}</strong><br>
+                            <small class="text-muted">
+                                {% if consentimiento.texto_consentimiento == "Consentimiento físico firmado en recepción" %}
+                                    {% trans "Consentimiento físico firmado" %}
+                                {% else %}
+                                    {% trans "Consentimiento online" %}
+                                {% endif %}
+                            </small>
+                            {% if consentimiento.revocado %}
+                                <span class="badge bg-danger">{% trans "Revocado" %}</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted mb-0">{% trans "No hay consentimientos registrados." %}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">{% trans "Acciones" %}</h5>
+                </div>
+                <div class="card-body">
+                    {% if not reserva.checkin_online_completado %}
+                        {% if reserva.checkin_online_omitido %}
+                            <a href="{% url 'checkin_presencial_staff' reserva.id %}" class="btn btn-warning w-100 mb-2">
+                                {% trans "Realizar Check-in Presencial" %}
+                            </a>
+                        {% else %}
+                            <p class="text-muted small">
+                                {% trans "El cliente no ha completado el check-in online ni lo ha omitido." %}
+                            </p>
+                            <a href="{% url 'checkin_presencial_staff' reserva.id %}" class="btn btn-warning w-100 mb-2">
+                                {% trans "Realizar Check-in Presencial" %}
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-success small mb-2">
+                            <i class="bi bi-check-circle"></i> {% trans "Check-in completado" %}
+                        </p>
+
+                        {% if not reserva.ses_hospedajes_enviado %}
+                            <form method="post" action="{% url 'enviar_ses_hospedajes' reserva.id %}" class="mb-2">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary w-100">
+                                    {% trans "Enviar a SES Hospedajes" %}
+                                </button>
+                            </form>
+                        {% else %}
+                            <p class="text-success small mb-2">
+                                <i class="bi bi-check-circle"></i> {% trans "Enviado a SES Hospedajes" %}
+                            </p>
+                        {% endif %}
+                    {% endif %}
+
+                    <hr>
+
+                    <a href="{% url 'admin:reservas_reserva_change' reserva.id %}" class="btn btn-outline-secondary w-100 mb-2">
+                        {% trans "Editar en Admin" %}
+                    </a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">{% trans "Información de Contacto" %}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1">
+                        <strong>{% trans "Email" %}:</strong><br>
+                        {{ reserva.cliente.email }}
+                    </p>
+                    <p class="mb-1">
+                        <strong>{% trans "Teléfono" %}:</strong><br>
+                        {{ reserva.cliente.telefono }}
+                    </p>
+                    {% if reserva.cliente.direccion %}
+                    <p class="mb-0">
+                        <strong>{% trans "Dirección" %}:</strong><br>
+                        {{ reserva.cliente.direccion }}<br>
+                        {{ reserva.cliente.codigo_postal }} {{ reserva.cliente.ciudad }}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

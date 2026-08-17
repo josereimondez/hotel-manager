@@ -83,24 +83,32 @@
  <strong>{% trans "Importante:" %}</strong> {% trans "Te hemos enviado un email de confirmación a" %} {{ reserva.cliente.email }}
  </div>
 
- <div class="alert {% if reserva.checkin_online_completado %}alert-success{% else %}alert-warning{% endif %} mt-3">
- <strong>{% trans "Check-in online:" %}</strong>
- {% if reserva.checkin_online_completado %}
- {% trans "Completado. Datos listos para comunicación a SES Hospedajes." %}
- {% else %}
- {% trans "Pendiente. Debes completar los datos de viajeros obligatorios." %}
- {% endif %}
- </div>
- </div>
- </div>
- 
- <div class="text-center mt-4">
- <a href="{% url 'home' %}" class="btn btn-primary">{% trans "Volver al Inicio" %}</a>
- <a href="{% url 'mis_reservas' %}" class="btn btn-outline-secondary">{% trans "Ver Mis Reservas" %}</a>
- {% if not reserva.checkin_online_completado %}
- <a href="{% url 'checkin_online_reserva' reserva.id %}" class="btn btn-warning">{% trans "Completar Check-in Online" %}</a>
- {% endif %}
- </div>
+<div class="alert {% if reserva.checkin_online_completado %}alert-success{% elif reserva.checkin_online_omitido %}alert-secondary{% else %}alert-warning{% endif %} mt-3">
+<strong>{% trans "Check-in online:" %}</strong>
+{% if reserva.checkin_online_completado %}
+{% trans "Completado. Datos listos para comunicación a SES Hospedajes." %}
+{% elif reserva.checkin_online_omitido %}
+{% trans "Omitido. Deberás registrarte presencialmente en recepción con tu documentación." %}
+{% else %}
+{% trans "Pendiente. Debes completar los datos de viajeros obligatorios." %}
+{% endif %}
+</div>
+</div>
+</div>
+
+<div class="text-center mt-4">
+<a href="{% url 'home' %}" class="btn btn-primary">{% trans "Volver al Inicio" %}</a>
+<a href="{% url 'mis_reservas' %}" class="btn btn-outline-secondary">{% trans "Ver Mis Reservas" %}</a>
+{% if not reserva.checkin_online_completado and not reserva.checkin_online_omitido %}
+<a href="{% url 'checkin_online_reserva' reserva.id %}" class="btn btn-warning">{% trans "Completar Check-in Online" %}</a>
+<form method="post" action="{% url 'omitir_checkin_online' reserva.id %}" class="d-inline">
+{% csrf_token %}
+<button type="submit" class="btn btn-outline-warning" onclick="return confirm('{% trans "¿Estás seguro de que quieres omitir el check-in online? Deberás registrarte presencialmente en recepción." %}');">
+{% trans "Omitir Check-in Online" %}
+</button>
+</form>
+{% endif %}
+</div>
  </div>
 </div>
 {% endblock %}
